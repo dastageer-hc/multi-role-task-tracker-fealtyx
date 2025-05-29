@@ -1,26 +1,65 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-pale-purple: #e5d9f2;
+  --color-magnolia: #f5efff;
+  --color-periwinkle: #cdc1ff;
+  --color-tropical-indigo: #a594f9;
+  --color-medium-slate-blue: #7371fc;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --border-width-default: 1px;
+  --border-width-thick: 2px;
+
+  --shadow-light: 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-medium: 0 4px 6px rgba(0,0,0,0.15);
+  --shadow-heavy: 0 10px 20px rgba(0,0,0,0.2);
+
+  --bg-gradient-top-right: linear-gradient(45deg, var(--color-pale-purple), var(--color-magnolia), var(--color-periwinkle), var(--color-tropical-indigo), var(--color-medium-slate-blue));
+  --bg-gradient-radial: radial-gradient(circle, var(--color-pale-purple), var(--color-magnolia), var(--color-periwinkle), var(--color-tropical-indigo), var(--color-medium-slate-blue));
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Optionally add utilities if you want */
+
+.bg-gradient-top-right {
+  background-image: var(--bg-gradient-top-right);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.bg-gradient-radial {
+  background-image: var(--bg-gradient-radial);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.rounded-sm {
+  border-radius: var(--radius-sm);
+}
+
+.rounded-md {
+  border-radius: var(--radius-md);
+}
+
+.rounded-lg {
+  border-radius: var(--radius-lg);
+}
+
+.border {
+  border-width: var(--border-width-default);
+}
+
+.border-thick {
+  border-width: var(--border-width-thick);
+}
+
+.shadow-light {
+  box-shadow: var(--shadow-light);
+}
+
+.shadow-medium {
+  box-shadow: var(--shadow-medium);
+}
+
+.shadow-heavy {
+  box-shadow: var(--shadow-heavy);
 }
