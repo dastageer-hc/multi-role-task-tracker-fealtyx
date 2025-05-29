@@ -23,7 +23,7 @@ const variants = [
   "tooltip",
 ] as const;
 
-export const TypographyShowcase = () => {
+const TypographyShowcase = () => {
   return (
     <div className='p-8 space-y-12 bg-white min-h-screen'>
       {variants.map((variant) => (
@@ -84,3 +84,5 @@ export const TypographyShowcase = () => {
     </div>
   );
 };
+
+export default TypographyShowcase;

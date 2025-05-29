@@ -1,6 +1,4 @@
-
-import { TypographyShowcase } from "@/pages/test";
-
+import TypographyShowcase from "@/screens/test";
 
 export default function Home() {
   return (
