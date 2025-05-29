@@ -72,15 +72,12 @@ export const TypographyShowcase = () => {
           </div>
         </div>
       ))}
-      // Using colors
       <div className='bg-pale-purple text-tropical-indigo rounded-md p-6 shadow-light'>
         This box uses your palette colors and border radius.
       </div>
-      // Using gradients
       <div className='bg-gradient-top-right p-8 rounded-lg text-white'>
         This box has a smooth gradient background.
       </div>
-      // Button example
       <button className='bg-medium-slate-blue hover:bg-tropical-indigo text-white px-4 py-2 rounded-md shadow-medium transition-colors duration-300'>
         Click Me
       </button>
