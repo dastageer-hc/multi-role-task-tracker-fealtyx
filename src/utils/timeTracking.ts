@@ -30,8 +30,11 @@ export const calculateTotalTime = (timeEntries: TimeEntry[]): number => {
 export const startTimeTracking = (task: Task): Task => {
   const newTimeEntry: TimeEntry = {
     startTime: new Date().toISOString(),
-    endTime: null,
+    endTime: undefined,
     duration: 0,
+    id: "",
+    userId: "",
+    userName: "",
   };
 
   return {
@@ -46,7 +49,10 @@ export const stopTimeTracking = (task: Task): Task => {
 
   const endTime = new Date().toISOString();
   const startTime = new Date(lastEntry.startTime);
-  const duration = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
+  const endTimeDate = new Date(endTime);
+  const duration = Math.floor(
+    (endTimeDate.getTime() - startTime.getTime()) / 1000
+  );
 
   const updatedTimeEntries = task.timeEntries.map((entry, index) => {
     if (index === task.timeEntries.length - 1) {

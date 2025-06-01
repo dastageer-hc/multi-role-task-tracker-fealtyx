@@ -1,7 +1,7 @@
 import { User } from "@/types/auth";
 
 export type TaskStatus = "todo" | "in_progress" | "review" | "done";
-export type TaskPriority = "low" | "medium" | "high";
+export type TaskPriority = "low" | "medium" | "high" | "urgent";
 export type TaskType = "feature" | "bug" | "improvement";
 
 export interface Comment {
