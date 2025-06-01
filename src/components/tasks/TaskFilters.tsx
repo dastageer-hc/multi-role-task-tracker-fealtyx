@@ -4,7 +4,7 @@ import { TaskStatus, TaskPriority, TaskType } from "@/types/task";
 import { Input } from "../core-ui/input";
 import { Select } from "../core-ui/select";
 import { Button } from "../core-ui/button";
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUp, ArrowDown, Filter, SortAsc, SortDesc } from "lucide-react";
 
 interface TaskFiltersProps {
   filters: {
@@ -124,34 +124,29 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
           <Typography variant='body' className='mb-2'>
             Sort By
           </Typography>
-          <Select
-            options={sortOptions}
-            value={sortBy}
-            onChange={(value) => setSortBy(value as typeof sortBy)}
-            placeholder='Select sort field'
-          />
+          <div className='flex items-center gap-2'>
+            <Select
+              options={sortOptions}
+              value={sortBy}
+              onChange={(value) => setSortBy(value as typeof sortBy)}
+              placeholder='Select sort field'
+            />
+            <Button
+              variant='secondary'
+              size='small'
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              className='p-2'
+            >
+              {sortOrder === "asc" ? (
+                <SortAsc className='w-4 h-4' />
+              ) : (
+                <SortDesc className='w-4 h-4' />
+              )}
+            </Button>
+          </div>
         </div>
 
-        <div>
-          <Typography variant='body' className='mb-2'>
-            Order
-          </Typography>
-          <Button
-            variant='secondary'
-            size='medium'
-            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-            leftIcon={
-              sortOrder === "asc" ? (
-                <ArrowUp className='w-4 h-4' />
-              ) : (
-                <ArrowDown className='w-4 h-4' />
-              )
-            }
-            fullWidth
-          >
-            {sortOrder === "asc" ? "Ascending" : "Descending"}
-          </Button>
-        </div>
+       
       </div>
     </div>
   );

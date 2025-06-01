@@ -3,9 +3,8 @@ import { Task, TaskStatus } from "@/types/task";
 import { Typography } from "../core-ui/typography";
 import { Tag } from "../core-ui/tag";
 import { StatusSelect } from "../core-ui/status-select";
-import { Calendar, Clock, Edit2, Trash2 } from "lucide-react";
+import { Calendar, Clock, Edit2, Trash2, User } from "lucide-react";
 import {
-  getTaskStatusConfig,
   getTaskPriorityConfig,
   getTaskTypeConfig,
 } from "../../utils/taskUtils";
@@ -33,7 +32,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onStatusChange,
 }) => {
   const { user } = useAuthStore();
-  const taskStatusConfig = getTaskStatusConfig(task.status);
   const taskPriorityConfig = getTaskPriorityConfig(task.priority);
   const taskTypeConfig = getTaskTypeConfig(task.type);
 
@@ -105,13 +103,22 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
         <div className='flex items-center justify-between text-sm text-gray-500'>
           {task.assignee && (
-            <div className='flex items-center gap-2'>
-              <span className='font-medium'>Assigned to:</span>
-              {task.assignee.name}
+            <div className='flex items-center gap-2 group relative'>
+              <User className='h-4 w-4 text-gray-400' size={12} />
+              <Typography
+                variant='body-sm'
+                tone='default'
+                className='font-medium whitespace-nowrap'
+              >
+                {task.assignee?.name}
+              </Typography>
+              <div className='absolute -top-8 left-0 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap'>
+                Assignment to developer
+              </div>
             </div>
           )}
 
-          <div className='flex justify-end w-full   bottom-0  '>
+          <div className='flex justify-end w-full bottom-0'>
             <StatusSelect
               options={availableStatusOptions}
               value={task.status}

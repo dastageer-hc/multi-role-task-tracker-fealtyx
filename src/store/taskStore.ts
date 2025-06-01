@@ -9,19 +9,14 @@ import {
   Attachment,
   TaskFilters,
   TaskSort,
-  TaskPriority,
-  TaskType,
 } from "@/types/task";
-import { startTimeTracking, stopTimeTracking } from "@/utils/timeTracking";
+import { useAuthStore } from "@/store/authStore";
 
 const STORAGE_KEYS = {
   TASKS: "tasks",
   TASK_FILTERS: "task-filters",
   TASK_SORT: "task-sort",
 } as const;
-
-// Helper function to generate unique IDs
-const generateId = () => Math.random().toString(36).substr(2, 9);
 
 // Helper function to calculate total time spent
 const calculateTotalTime = (timeEntries: TimeEntry[]): number => {
@@ -96,6 +91,12 @@ const createDummyTasks = (): Task[] => [
     storyPoints: 0,
     acceptanceCriteria: [],
     testCases: [],
+    assignee: {
+      id: "1",
+      email: "developer@example.com",
+      name: "John Developer",
+      role: "developer",
+    },
   },
   {
     id: "2",
@@ -117,6 +118,12 @@ const createDummyTasks = (): Task[] => [
     storyPoints: 0,
     acceptanceCriteria: [],
     testCases: [],
+    assignee: {
+      id: "1",
+      email: "developer@example.com",
+      name: "John Developer",
+      role: "developer",
+    },
   },
 ];
 
@@ -194,6 +201,8 @@ export const useTaskStore = create<TaskState>()(
               storyPoints: 0,
               acceptanceCriteria: [],
               testCases: [],
+              assignee:
+                taskData.assignee || useAuthStore.getState().user || undefined,
             } as Task,
           ],
         })),
@@ -519,7 +528,7 @@ export const useTaskStore = create<TaskState>()(
         })),
 
       setSort: (sort: TaskSort) =>
-        set((state) => ({
+        set(() => ({
           sort,
         })),
 

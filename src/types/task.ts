@@ -1,14 +1,8 @@
+import { User } from "@/types/auth";
+
 export type TaskStatus = "todo" | "in_progress" | "review" | "done";
 export type TaskPriority = "low" | "medium" | "high";
 export type TaskType = "feature" | "bug" | "improvement";
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: "manager" | "developer";
-  avatar?: string;
-}
 
 export interface Comment {
   id: string;

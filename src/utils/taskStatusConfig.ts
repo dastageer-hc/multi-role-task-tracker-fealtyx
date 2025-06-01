@@ -1,9 +1,4 @@
-import {
-  AlertCircle,
-  Clock,
-  User as UserIcon,
-  CheckCircle,
-} from "lucide-react";
+import { AlertCircle, CheckCircle, UserIcon } from "lucide-react";
 import { TaskStatus } from "@/types/task";
 
 interface StatusConfig {

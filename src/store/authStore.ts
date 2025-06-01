@@ -1,7 +1,7 @@
 // src/store/authStore.ts
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { AuthState, User } from "@/types/auth";
+import { persist, PersistStorage } from "zustand/middleware";
+import { User } from "@/types/auth";
 
 // Dummy users data
 const DUMMY_USERS: User[] = [
@@ -31,111 +31,103 @@ const STORAGE_KEYS = {
   CURRENT_USER: "current-user",
 };
 
-// LocalStorage helper functions
-const storage = {
-  setItem: (key: string, value: any) => {
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.error("Error saving to localStorage:", error);
-    }
-  },
+interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (credentials: { email: string; password: string }) => Promise<void>;
+  logout: () => void;
+  initializeAuth: () => Promise<void>;
+}
 
-  getItem: <T>(key: string): T | null => {
-    try {
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : null;
-    } catch (error) {
-      console.error("Error reading from localStorage:", error);
-      return null;
-    }
-  },
-
-  removeItem: (key: string) => {
-    try {
-      localStorage.removeItem(key);
-    } catch (error) {
-      console.error("Error removing from localStorage:", error);
-    }
-  },
-};
+interface Storage {
+  getItem: (name: string) => string | null;
+  setItem: (name: string, value: string) => void;
+  removeItem: (name: string) => void;
+}
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      setUser: (user: User | null) => set({ user }),
       isAuthenticated: false,
       isLoading: true,
+      login: async (credentials) => {
+        console.log("Login attempt:", {
+          email: credentials.email,
+          password: credentials.password,
+        });
 
-      login: async (email: string, password: string) => {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Find matching credentials
-        const credentialIndex = VALID_CREDENTIALS.findIndex(
-          (cred) => cred.email === email && cred.password === password
-        );
-
-        if (credentialIndex !== -1) {
-          const user = DUMMY_USERS[credentialIndex];
-
-          // Save to localStorage
-          storage.setItem(STORAGE_KEYS.AUTH_TOKEN, "dummy-token");
-          storage.setItem(STORAGE_KEYS.CURRENT_USER, user);
-
+        // Check developer credentials
+        if (
+          credentials.email === "developer@example.com" &&
+          credentials.password === "dev123"
+        ) {
+          const user = DUMMY_USERS[0]; // Developer user
+          console.log("Developer login successful:", user);
+          localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
           set({
             user,
             isAuthenticated: true,
-            isLoading: false,
           });
-          return true;
+          return;
         }
-        return false;
-      },
 
+        // Check manager credentials
+        if (
+          credentials.email === "manager@example.com" &&
+          credentials.password === "man123"
+        ) {
+          const user = DUMMY_USERS[1]; // Manager user
+          console.log("Manager login successful:", user);
+          localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+          set({
+            user,
+            isAuthenticated: true,
+          });
+          return;
+        }
+
+        console.log("Login failed - invalid credentials");
+        throw new Error("Invalid credentials");
+      },
       logout: () => {
-        // Remove from localStorage
-        storage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-        storage.removeItem(STORAGE_KEYS.CURRENT_USER);
-
-        set({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-        });
+        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+        set({ user: null, isAuthenticated: false });
       },
-
-      initializeAuth: () => {
+      initializeAuth: async () => {
         try {
-          const token = storage.getItem<string>(STORAGE_KEYS.AUTH_TOKEN);
-          const user = storage.getItem<User>(STORAGE_KEYS.CURRENT_USER);
-
-          if (token && user) {
-            set({
-              user,
-              isAuthenticated: true,
-              isLoading: false,
-            });
+          const storedUser = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+          if (storedUser) {
+            const user = JSON.parse(storedUser);
+            set({ user, isAuthenticated: true, isLoading: false });
           } else {
-            set({
-              user: null,
-              isAuthenticated: false,
-              isLoading: false,
-            });
+            set({ isLoading: false });
           }
         } catch (error) {
           console.error("Error initializing auth:", error);
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-          });
+          set({ isLoading: false });
         }
       },
     }),
     {
       name: "auth-storage",
+      storage: {
+        getItem: (name) => {
+          const str = localStorage.getItem(name);
+          if (!str) return null;
+          try {
+            return JSON.parse(str);
+          } catch {
+            return null;
+          }
+        },
+        setItem: (name, value) => {
+          localStorage.setItem(name, JSON.stringify(value));
+        },
+        removeItem: (name) => localStorage.removeItem(name),
+      } as PersistStorage<AuthState>,
     }
   )
 );
