@@ -19,7 +19,7 @@ interface TaskCardProps {
   onStatusChange: (taskId: string, status: TaskStatus) => void;
 }
 
-const statusOptions = [
+const statusOptions: { value: TaskStatus; label: string }[] = [
   { value: "todo", label: "To Do" },
   { value: "in_progress", label: "In Progress" },
   { value: "review", label: "Review" },
@@ -38,7 +38,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   const taskTypeConfig = getTaskTypeConfig(task.type);
 
   // Filter out 'done' option for developers
-  const availableStatusOptions = statusOptions.filter(option => {
+  const availableStatusOptions = statusOptions.filter((option) => {
     if (user?.role !== "manager" && option.value === "done") {
       return false;
     }
@@ -47,18 +47,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
   return (
     <div className='bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow'>
-      <div className='p-6'>
-        <div className='flex items-start justify-between mb-4'>
-          <div className='flex-1'>
-            <Typography variant='h3' className='mb-2'>
+      <div className='p-6 relative'>
+        <div className='flex items-start justify-between mb-2'>
+          <div className='flex-1 gap-2 flex flex-col'>
+            <Typography variant='h3' className=''>
               {task.title}
             </Typography>
-            <div className='flex items-center gap-2 mb-4'>
-              <StatusSelect
-                options={availableStatusOptions}
-                value={task.status}
-                onChange={(value) => onStatusChange(task.id, value)}
-              />
+            <div className='flex items-center gap-2 '>
               <Tag
                 label={taskPriorityConfig?.label}
                 variant={taskPriorityConfig?.variant}
@@ -91,27 +86,38 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           {task.description}
         </Typography>
 
-        <div className='flex items-center justify-between text-sm text-gray-500'>
-          <div className='flex items-center gap-4'>
-            <div className='flex items-center gap-1'>
-              <Clock className='h-4 w-4' />
-              <span className='font-medium'>Created:</span>{" "}
-              {formatDate(task.createdAt)}
-            </div>
-            {task.dueDate && (
-              <div className='flex items-center gap-1'>
-                <Calendar className='h-4 w-4' />
-                <span className='font-medium'>Due:</span>{" "}
-                {formatDate(task.dueDate)}
-              </div>
-            )}
+        {/* task dates */}
+        <div className='flex  gap-1 flex-col mt-2 mb-2'>
+          <div className='flex items-center gap-1'>
+            <Clock className='h-4 w-4' />
+            <span className='font-medium'>Created:</span>{" "}
+            {formatDate(task.createdAt)}
           </div>
+          {task.dueDate && (
+            <div className='flex items-center gap-1'>
+              <Calendar className='h-4 w-4' />
+              <span className='font-medium'>Due:</span>{" "}
+              {formatDate(task.dueDate)}
+            </div>
+          )}
+        </div>
+        <div className='border-t h-2 w-full mb-2 border-gray-200'> </div>
+
+        <div className='flex items-center justify-between text-sm text-gray-500'>
           {task.assignee && (
             <div className='flex items-center gap-2'>
               <span className='font-medium'>Assigned to:</span>
               {task.assignee.name}
             </div>
           )}
+
+          <div className='flex justify-end w-full   bottom-0  '>
+            <StatusSelect
+              options={availableStatusOptions}
+              value={task.status}
+              onChange={(value) => onStatusChange(task.id, value)}
+            />
+          </div>
         </div>
       </div>
     </div>

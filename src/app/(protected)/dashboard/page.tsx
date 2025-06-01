@@ -10,6 +10,7 @@ import {
   TimeTrackingChart,
   TaskCard,
 } from "@/components/tasks";
+import { PlusIcon } from "lucide-react";
 import { Typography } from "@/components/core-ui/typography";
 import { Button } from "@/components/core-ui/button";
 import { Task, TaskStatus, TaskPriority, TaskType } from "@/types/task";
@@ -100,7 +101,9 @@ export default function DashboardPage() {
           <div className='flex gap-2 flex-col'>
             <Typography variant='h2'> Dashboard</Typography>
           </div>
-          <Button onClick={() => setShowTaskForm(true)}>Create New Task</Button>
+          <Button onClick={() => setShowTaskForm(true)} leftIcon={<PlusIcon />}>
+            Create New Task
+          </Button>
         </div>
 
         <div className='pt-[5rem]'></div>
