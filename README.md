@@ -27,9 +27,7 @@ A modern task management system built with Next.js, featuring role-based access 
   - Status
   - Priority
   - Type
-  - Assignee
   - Search text
-  - Date range
 - Sort tasks by:
   - Due date
   - Priority (Urgent tasks always appear first)
