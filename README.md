@@ -1,37 +1,158 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Task Management System
+
+![Task Management System](./assets/image.png)
+
+A modern task management system built with Next.js, featuring role-based access control, task tracking, and a beautiful UI.
+
+## Features
+
+### Authentication & Authorization
+
+- Role-based access control (Manager and Developer roles)
+- Secure login system
+- Persistent authentication state
+
+### Task Management
+
+- Create, read, update, and delete tasks
+- Task status tracking (To Do, In Progress, Review, Done)
+- Priority levels (Low, Medium, High, Urgent)
+- Task types (Feature, Bug, Improvement)
+- Due date management
+- Task assignment to team members
+
+### Task Organization
+
+- Filter tasks by:
+  - Status
+  - Priority
+  - Type
+  - Assignee
+  - Search text
+  - Date range
+- Sort tasks by:
+  - Due date
+  - Priority (Urgent tasks always appear first)
+  - Creation date
+
+### Task Details
+
+- Title and description
+- Status updates
+- Priority indicators
+- Type classification
+- Due date tracking
+- Creation date
+- Assignee information
+- Tags and labels
+
+### UI/UX Features
+
+- Responsive design
+- Modern and clean interface
+- Interactive task cards
+- Status color coding
+- Priority-based visual indicators
+- Hover effects and transitions
+- Tooltips for additional information
+
+## Prerequisites
+
+- Node.js 18.x or later
+- npm or yarn package manager
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd fealtyx-assignment
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Run the development server:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Login Credentials
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Manager Account
 
-## Learn More
+- Email: manager@example.com
+- Password: man123
 
-To learn more about Next.js, take a look at the following resources:
+### Developer Account
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Email: developer@example.com
+- Password: dev123
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+```
+src/
+├── app/                    # Next.js app directory
+│   ├── (auth)/            # Authentication routes
+│   └── (protected)/       # Protected routes
+├── components/            # React components
+│   ├── core-ui/          # Reusable UI components
+│   └── tasks/            # Task-related components
+├── store/                # State management
+├── types/                # TypeScript type definitions
+└── utils/                # Utility functions
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Technologies Used
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# multi-role-task-tracker-fealtyx
+- [Next.js](https://nextjs.org/) - React framework
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [Zustand](https://github.com/pmndrs/zustand) - State management
+- [Lucide React](https://lucide.dev/) - Icons
+- [Geist Font](https://vercel.com/font) - Typography
+
+## Development
+
+### Code Style
+
+- Follow TypeScript best practices
+- Use functional components with hooks
+- Implement proper type definitions
+- Follow the project's component structure
+
+### State Management
+
+- Use Zustand for global state
+- Implement proper state persistence
+- Handle loading and error states
+
+### Styling
+
+- Use Tailwind CSS for styling
+- Follow the project's color scheme
+- Maintain consistent spacing and typography
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
