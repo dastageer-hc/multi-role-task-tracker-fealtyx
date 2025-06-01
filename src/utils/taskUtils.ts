@@ -42,6 +42,10 @@ export const getTaskPriorityConfig = (priority: TaskPriority): TaskConfig => {
       label: "High",
       variant: "danger",
     },
+    urgent: {
+      label: "Urgent",
+      variant: "danger",
+    },
   };
 
   return configs[priority];
