@@ -1,31 +1,37 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import LocalFont from "next/font/local";
+import { Kumbh_Sans } from "next/font/google";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/components/AuthProvider";
 
-const KumbhSans = LocalFont({
-  src: "../assets//fonts/KumbhSans.ttf",
+const KumbhSans = Kumbh_Sans({
+  subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "FealtyX Task Tracker",
-  description: "Task/Bug Tracker for FealtyX",
+  title: "Task Management System",
+  description: "A modern task management system built with Next.js",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang='en'>
       <head>
-        <meta charSet='UTF-8' />
-        <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+        <meta charSet='utf-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='../assets/favicon.ico' />
-
       </head>
-      <body className={KumbhSans.className}>{children}</body>
+      <body className={KumbhSans.className} suppressHydrationWarning>
+        <AuthProvider>
+          {children}
+          <Toaster />
+        </AuthProvider>
+      </body>
     </html>
   );
 }
