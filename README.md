@@ -1,6 +1,6 @@
 # Task Management System
 
-![Task Management System](./assets/image.png)
+![Task Management System](./src/assets/image.png)
 
 A modern task management system built with Next.js, featuring role-based access control, task tracking, and a beautiful UI.
 
