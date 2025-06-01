@@ -95,19 +95,15 @@ export default function DashboardPage() {
 
   return (
     <div className='min-h-screen bg-gray-50'>
-      <div className='max-w-[2000px] mx-auto p-6'>
-        <div className='flex items-center justify-between mb-6'>
-          <div>
-            <Typography variant='h1'>Welcome, {user.name}</Typography>
-            <Typography variant='body' tone='muted'>
-              {user.role === "manager"
-                ? "Manager Dashboard"
-                : "Developer Dashboard"}
-            </Typography>
+      <div className='max-w-[2000px] mx-auto p-6 relative'>
+        <div className='flex items-center justify-between mb-6 absolute top-0 pb-5 pt-5  bg-gray-50 w-[95%]'>
+          <div className='flex gap-2 flex-col'>
+            <Typography variant='h2'> Dashboard</Typography>
           </div>
           <Button onClick={() => setShowTaskForm(true)}>Create New Task</Button>
         </div>
 
+        <div className='pt-[5rem]'></div>
         <TaskStats tasks={tasks} />
 
         {user.role === "manager" && (
