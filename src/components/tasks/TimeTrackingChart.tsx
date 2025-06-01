@@ -43,7 +43,13 @@ export const TimeTrackingChart: React.FC<TimeTrackingChartProps> = ({
   const concurrentTasks = last7Days.map((date) => {
     return tasks.filter((task) => {
       const taskDate = new Date(task.createdAt).toISOString().split("T")[0];
-      return taskDate === date;
+      // Only count tasks that are in progress or in review
+      return (
+        taskDate === date &&
+        (task.status === "in_progress" ||
+          task.status === "review" ||
+          task.status === "done")
+      );
     }).length;
   });
 

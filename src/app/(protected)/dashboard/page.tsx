@@ -16,7 +16,8 @@ import { Task, TaskStatus, TaskPriority, TaskType } from "@/types/task";
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
-  const { tasks, addTask, updateTask, deleteTask } = useTaskStore();
+  const { tasks, addTask, updateTask, deleteTask, updateTaskStatus } =
+    useTaskStore();
   const [showTaskForm, setShowTaskForm] = React.useState(false);
   const [editingTask, setEditingTask] = React.useState<
     Partial<Task> | undefined
@@ -31,6 +32,32 @@ export default function DashboardPage() {
     "dueDate" | "priority" | "createdAt"
   >("dueDate");
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
+
+  const handleAddTask = (task: Partial<Task>) => {
+    addTask(task);
+    setShowTaskForm(false);
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setShowTaskForm(true);
+  };
+
+  const handleUpdateTask = (task: Partial<Task>) => {
+    if (editingTask?.id) {
+      updateTask(editingTask.id, task);
+      setShowTaskForm(false);
+      setEditingTask(undefined);
+    }
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    deleteTask(taskId);
+  };
+
+  const handleStatusChange = (taskId: string, status: TaskStatus) => {
+    updateTaskStatus(taskId, status);
+  };
 
   const filteredTasks = React.useMemo(() => {
     return tasks
@@ -55,27 +82,6 @@ export default function DashboardPage() {
           : 0;
       });
   }, [tasks, filters, sortBy, sortOrder]);
-
-  const handleTaskSubmit = (task: Partial<Task>) => {
-    if (editingTask?.id) {
-      updateTask(editingTask.id, task);
-    } else {
-      addTask(task);
-    }
-    setShowTaskForm(false);
-    setEditingTask(undefined);
-  };
-
-  const handleEditTask = (task: Task) => {
-    setEditingTask(task);
-    setShowTaskForm(true);
-  };
-
-  const handleDeleteTask = (taskId: string) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
-      deleteTask(taskId);
-    }
-  };
 
   if (!user) {
     return (
@@ -126,6 +132,7 @@ export default function DashboardPage() {
               task={task}
               onEdit={handleEditTask}
               onDelete={handleDeleteTask}
+              onStatusChange={handleStatusChange}
             />
           ))}
         </div>
@@ -161,7 +168,7 @@ export default function DashboardPage() {
               </div>
               <TaskForm
                 task={editingTask}
-                onSubmit={handleTaskSubmit}
+                onSubmit={editingTask ? handleUpdateTask : handleAddTask}
                 onCancel={() => {
                   setShowTaskForm(false);
                   setEditingTask(undefined);

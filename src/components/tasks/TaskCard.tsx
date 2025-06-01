@@ -1,8 +1,9 @@
 import React from "react";
-import { Task } from "@/types/task";
+import { Task, TaskStatus } from "@/types/task";
 import { Typography } from "../core-ui/typography";
 import { Tag } from "../core-ui/tag";
 import { Button } from "../core-ui/button";
+import { Select } from "../core-ui/select";
 import {
   getTaskStatusConfig,
   getTaskPriorityConfig,
@@ -14,12 +15,21 @@ interface TaskCardProps {
   task: Task;
   onEdit: (task: Task) => void;
   onDelete: (taskId: string) => void;
+  onStatusChange: (taskId: string, status: TaskStatus) => void;
 }
+
+const statusOptions = [
+  { value: "todo", label: "To Do" },
+  { value: "in_progress", label: "In Progress" },
+  { value: "review", label: "Review" },
+  { value: "done", label: "Done" },
+];
 
 export const TaskCard: React.FC<TaskCardProps> = ({
   task,
   onEdit,
   onDelete,
+  onStatusChange,
 }) => {
   const taskStatusConfig = getTaskStatusConfig(task.status);
   const taskPriorityConfig = getTaskPriorityConfig(task.priority);
@@ -34,10 +44,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               {task.title}
             </Typography>
             <div className='flex items-center gap-2 mb-4'>
-              <Tag
-                label={taskStatusConfig?.label}
-                variant={taskStatusConfig?.variant}
-                size='sm'
+              <Select
+                options={statusOptions}
+                value={task.status}
+                onChange={(value) => onStatusChange(task.id, value as TaskStatus)}
+                className='w-32'
               />
               <Tag
                 label={taskPriorityConfig?.label}

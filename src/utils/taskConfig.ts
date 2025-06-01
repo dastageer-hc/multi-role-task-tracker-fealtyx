@@ -14,8 +14,8 @@ interface PriorityConfig {
 }
 
 export const statusConfig: Record<TaskStatus, StatusConfig> = {
-  open: {
-    label: "Open",
+  todo: {
+    label: "To Do",
     color: "bg-blue-100 text-blue-800",
     icon: AlertCircle,
   },
@@ -29,8 +29,8 @@ export const statusConfig: Record<TaskStatus, StatusConfig> = {
     color: "bg-purple-100 text-purple-800",
     icon: User,
   },
-  closed: {
-    label: "Closed",
+  done: {
+    label: "Done",
     color: "bg-green-100 text-green-800",
     icon: CheckCircle,
   },

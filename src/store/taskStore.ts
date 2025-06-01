@@ -81,7 +81,7 @@ const createDummyTasks = (): Task[] => [
     title: "Implement user authentication",
     description: "Add login and registration functionality",
     type: "feature",
-    status: "open",
+    status: "todo",
     priority: "high",
     dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     createdAt: new Date().toISOString(),
@@ -177,7 +177,7 @@ export const useTaskStore = create<TaskState>()(
               id: Math.random().toString(36).substr(2, 9),
               title: taskData.title || "",
               description: taskData.description || "",
-              status: taskData.status || "open",
+              status: taskData.status || "todo",
               priority: taskData.priority || "medium",
               type: taskData.type || "feature",
               dueDate:
@@ -524,117 +524,104 @@ export const useTaskStore = create<TaskState>()(
         })),
 
       getFilteredTasks: () => {
-        const state = get();
-        let filteredTasks = [...state.tasks];
+        const { tasks, filters } = get();
+        return tasks.filter((task) => {
+          // Apply search filter
+          if (
+            filters.search &&
+            !task.title.toLowerCase().includes(filters.search.toLowerCase()) &&
+            !task.description
+              .toLowerCase()
+              .includes(filters.search.toLowerCase())
+          ) {
+            return false;
+          }
 
-        // Apply filters
-        if (state.filters.status) {
-          filteredTasks = filteredTasks.filter(
-            (task: Task) => task.status === state.filters.status
-          );
-        }
-        if (state.filters.priority) {
-          filteredTasks = filteredTasks.filter(
-            (task: Task) => task.priority === state.filters.priority
-          );
-        }
-        if (state.filters.type) {
-          filteredTasks = filteredTasks.filter(
-            (task: Task) => task.type === state.filters.type
-          );
-        }
-        if (state.filters.assignee) {
-          filteredTasks = filteredTasks.filter(
-            (task: Task) => task.assignee?.id === state.filters.assignee
-          );
-        }
-        if (state.filters.search) {
-          const searchLower = state.filters.search.toLowerCase();
-          filteredTasks = filteredTasks.filter(
-            (task: Task) =>
-              task.title.toLowerCase().includes(searchLower) ||
-              task.description.toLowerCase().includes(searchLower)
-          );
-        }
-        if (state.filters.dateRange) {
-          const { start, end } = state.filters.dateRange;
-          filteredTasks = filteredTasks.filter(
-            (task: Task) =>
-              new Date(task.dueDate) >= new Date(start) &&
-              new Date(task.dueDate) <= new Date(end)
-          );
-        }
-        if (state.filters.tags?.length) {
-          filteredTasks = filteredTasks.filter((task: Task) =>
-            state.filters.tags?.some((tag) => task.tags.includes(tag))
-          );
-        }
-        if (state.filters.sprintId) {
-          filteredTasks = filteredTasks.filter(
-            (task: Task) => task.sprintId === state.filters.sprintId
-          );
-        }
-        if (state.filters.hasAttachments) {
-          filteredTasks = filteredTasks.filter(
-            (task: Task) => task.attachments.length > 0
-          );
-        }
-        if (state.filters.hasComments) {
-          filteredTasks = filteredTasks.filter(
-            (task: Task) => task.comments.length > 0
-          );
-        }
-        if (state.filters.isOverdue) {
-          filteredTasks = filteredTasks.filter(
-            (task: Task) =>
-              new Date(task.dueDate) < new Date() && task.status !== "closed"
-          );
-        }
-        if (state.filters.hasSubtasks) {
-          filteredTasks = filteredTasks.filter(
-            (task: Task) => (task.subtasks?.length ?? 0) > 0
-          );
-        }
-        if (state.filters.hasDependencies) {
-          filteredTasks = filteredTasks.filter(
-            (task: Task) => (task.dependencies?.length ?? 0) > 0
-          );
-        }
-        if (state.filters.hasRelatedTasks) {
-          filteredTasks = filteredTasks.filter(
-            (task: Task) => (task.relatedTasks?.length ?? 0) > 0
-          );
-        }
+          // Apply status filter
+          if (filters.status && task.status !== filters.status) {
+            return false;
+          }
 
-        // Apply sorting
-        if (state.sort.field) {
-          filteredTasks.sort((a: Task, b: Task) => {
-            const aValue = a[state.sort.field as keyof Task];
-            const bValue = b[state.sort.field as keyof Task];
+          // Apply priority filter
+          if (filters.priority && task.priority !== filters.priority) {
+            return false;
+          }
 
-            if (typeof aValue === "string" && typeof bValue === "string") {
-              return state.sort.direction === "asc"
-                ? aValue.localeCompare(bValue)
-                : bValue.localeCompare(aValue);
+          // Apply type filter
+          if (filters.type && task.type !== filters.type) {
+            return false;
+          }
+
+          // Apply assignee filter
+          if (filters.assignee && task.assignee?.id !== filters.assignee) {
+            return false;
+          }
+
+          // Apply date range filter
+          if (filters.dateRange) {
+            const taskDate = new Date(task.dueDate);
+            const startDate = new Date(filters.dateRange.start);
+            const endDate = new Date(filters.dateRange.end);
+            if (taskDate < startDate || taskDate > endDate) {
+              return false;
             }
+          }
 
-            if (aValue instanceof Date && bValue instanceof Date) {
-              return state.sort.direction === "asc"
-                ? aValue.getTime() - bValue.getTime()
-                : bValue.getTime() - aValue.getTime();
+          // Apply tags filter
+          if (filters.tags?.length) {
+            if (!filters.tags.every((tag) => task.tags.includes(tag))) {
+              return false;
             }
+          }
 
-            if (typeof aValue === "number" && typeof bValue === "number") {
-              return state.sort.direction === "asc"
-                ? aValue - bValue
-                : bValue - aValue;
+          // Apply sprint filter
+          if (filters.sprintId && task.sprintId !== filters.sprintId) {
+            return false;
+          }
+
+          // Apply attachments filter
+          if (filters.hasAttachments && task.attachments.length === 0) {
+            return false;
+          }
+
+          // Apply comments filter
+          if (filters.hasComments && task.comments.length === 0) {
+            return false;
+          }
+
+          // Apply overdue filter
+          if (filters.isOverdue) {
+            if (new Date(task.dueDate) < new Date() && task.status !== "done") {
+              return false;
             }
+          }
 
-            return 0;
-          });
-        }
+          // Apply subtasks filter
+          if (
+            filters.hasSubtasks &&
+            (!task.subtasks || task.subtasks.length === 0)
+          ) {
+            return false;
+          }
 
-        return filteredTasks;
+          // Apply dependencies filter
+          if (
+            filters.hasDependencies &&
+            (!task.dependencies || task.dependencies.length === 0)
+          ) {
+            return false;
+          }
+
+          // Apply related tasks filter
+          if (
+            filters.hasRelatedTasks &&
+            (!task.relatedTasks || task.relatedTasks.length === 0)
+          ) {
+            return false;
+          }
+
+          return true;
+        });
       },
 
       getTotalTimeSpent: (taskId: string) => {
