@@ -13,6 +13,7 @@ import {
   TaskType,
 } from "@/types/task";
 import { startTimeTracking, stopTimeTracking } from "@/utils/timeTracking";
+import { useAuthStore } from "@/store/authStore";
 
 const STORAGE_KEYS = {
   TASKS: "tasks",
@@ -96,6 +97,12 @@ const createDummyTasks = (): Task[] => [
     storyPoints: 0,
     acceptanceCriteria: [],
     testCases: [],
+    assignee: {
+      id: "1",
+      email: "developer@example.com",
+      name: "John Developer",
+      role: "developer",
+    },
   },
   {
     id: "2",
@@ -117,6 +124,12 @@ const createDummyTasks = (): Task[] => [
     storyPoints: 0,
     acceptanceCriteria: [],
     testCases: [],
+    assignee: {
+      id: "1",
+      email: "developer@example.com",
+      name: "John Developer",
+      role: "developer",
+    },
   },
 ];
 
@@ -194,6 +207,8 @@ export const useTaskStore = create<TaskState>()(
               storyPoints: 0,
               acceptanceCriteria: [],
               testCases: [],
+              assignee:
+                taskData.assignee || useAuthStore.getState().user || undefined,
             } as Task,
           ],
         })),
