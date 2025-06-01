@@ -2,14 +2,15 @@ import React from "react";
 import { Task, TaskStatus } from "@/types/task";
 import { Typography } from "../core-ui/typography";
 import { Tag } from "../core-ui/tag";
-import { Button } from "../core-ui/button";
-import { Select } from "../core-ui/select";
+import { StatusSelect } from "../core-ui/status-select";
+import { Calendar, Clock, Edit2, Trash2 } from "lucide-react";
 import {
   getTaskStatusConfig,
   getTaskPriorityConfig,
   getTaskTypeConfig,
 } from "../../utils/taskUtils";
 import { formatDate } from "../../utils/dateUtils";
+import { useAuthStore } from "@/store/authStore";
 
 interface TaskCardProps {
   task: Task;
@@ -31,9 +32,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onDelete,
   onStatusChange,
 }) => {
+  const { user } = useAuthStore();
   const taskStatusConfig = getTaskStatusConfig(task.status);
   const taskPriorityConfig = getTaskPriorityConfig(task.priority);
   const taskTypeConfig = getTaskTypeConfig(task.type);
+
+  // Filter out 'done' option for developers
+  const availableStatusOptions = statusOptions.filter(option => {
+    if (user?.role !== "manager" && option.value === "done") {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <div className='bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow'>
@@ -44,11 +54,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               {task.title}
             </Typography>
             <div className='flex items-center gap-2 mb-4'>
-              <Select
-                options={statusOptions}
+              <StatusSelect
+                options={availableStatusOptions}
                 value={task.status}
-                onChange={(value) => onStatusChange(task.id, value as TaskStatus)}
-                className='w-32'
+                onChange={(value) => onStatusChange(task.id, value)}
               />
               <Tag
                 label={taskPriorityConfig?.label}
@@ -63,20 +72,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             </div>
           </div>
           <div className='flex items-center gap-2'>
-            <Button
-              variant='secondary'
-              size='small'
+            <button
               onClick={() => onEdit(task)}
+              className='p-2 rounded-full hover:bg-gray-100 transition-colors'
             >
-              Edit
-            </Button>
-            <Button
-              variant='danger'
-              size='small'
+              <Edit2 className='h-4 w-4 text-gray-600' />
+            </button>
+            <button
               onClick={() => onDelete(task.id)}
+              className='p-2 rounded-full hover:bg-gray-100 transition-colors'
             >
-              Delete
-            </Button>
+              <Trash2 className='h-4 w-4 text-gray-600' />
+            </button>
           </div>
         </div>
 
@@ -86,12 +93,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
         <div className='flex items-center justify-between text-sm text-gray-500'>
           <div className='flex items-center gap-4'>
-            <div>
+            <div className='flex items-center gap-1'>
+              <Clock className='h-4 w-4' />
               <span className='font-medium'>Created:</span>{" "}
               {formatDate(task.createdAt)}
             </div>
             {task.dueDate && (
-              <div>
+              <div className='flex items-center gap-1'>
+                <Calendar className='h-4 w-4' />
                 <span className='font-medium'>Due:</span>{" "}
                 {formatDate(task.dueDate)}
               </div>
