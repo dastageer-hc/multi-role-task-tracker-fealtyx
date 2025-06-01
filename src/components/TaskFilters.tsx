@@ -1,28 +1,59 @@
 import React from "react";
-import { Search, Filter, ArrowUpDown } from "lucide-react";
-import { statusConfig, priorityConfig } from "../utils/taskConfig";
+import { Typography } from "./core-ui/typography";
+import { TaskStatus, TaskPriority, TaskType } from "@/types/task";
 import { Input } from "./core-ui/input";
 import { Select } from "./core-ui/select";
-import { Typography } from "./core-ui/typography";
-import {
-  TaskStatus,
-  TaskPriority,
-  TaskType,
-  TaskFilters as TaskFiltersType,
-} from "@/types/task";
+import { Button } from "./core-ui/button";
+import { ArrowUp, ArrowDown } from "lucide-react";
 
 interface TaskFiltersProps {
-  filters: TaskFiltersType;
-  setFilters: (
-    filters: TaskFiltersType | ((prev: TaskFiltersType) => TaskFiltersType)
-  ) => void;
+  filters: {
+    search: string;
+    status: TaskStatus | "";
+    priority: TaskPriority | "";
+    type: TaskType | "";
+  };
+  setFilters: (filters: {
+    search: string;
+    status: TaskStatus | "";
+    priority: TaskPriority | "";
+    type: TaskType | "";
+  }) => void;
   sortBy: "dueDate" | "priority" | "createdAt";
-  setSortBy: (sortBy: "dueDate" | "priority" | "createdAt") => void;
+  setSortBy: (field: "dueDate" | "priority" | "createdAt") => void;
   sortOrder: "asc" | "desc";
-  setSortOrder: (sortOrder: "asc" | "desc") => void;
+  setSortOrder: (order: "asc" | "desc") => void;
 }
 
-export const TaskFilters: React.FC<TaskFiltersProps> = ({
+const statusOptions = [
+  { value: "", label: "All" },
+  { value: "todo", label: "To Do" },
+  { value: "in_progress", label: "In Progress" },
+  { value: "review", label: "Review" },
+  { value: "done", label: "Done" },
+];
+
+const priorityOptions = [
+  { value: "", label: "All" },
+  { value: "low", label: "Low" },
+  { value: "medium", label: "Medium" },
+  { value: "high", label: "High" },
+];
+
+const typeOptions = [
+  { value: "", label: "All" },
+  { value: "feature", label: "Feature" },
+  { value: "bug", label: "Bug" },
+  { value: "improvement", label: "Improvement" },
+];
+
+const sortOptions = [
+  { value: "dueDate", label: "Due Date" },
+  { value: "priority", label: "Priority" },
+  { value: "createdAt", label: "Created At" },
+];
+
+const TaskFilters: React.FC<TaskFiltersProps> = ({
   filters,
   setFilters,
   sortBy,
@@ -30,122 +61,100 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
   sortOrder,
   setSortOrder,
 }) => {
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters({
+      ...filters,
+      [key]: value,
+    });
+  };
+
   return (
-    <div className='bg-white rounded-lg shadow-sm p-4 space-y-4'>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+    <div className='bg-white rounded-lg shadow-sm p-4 mb-6'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4'>
         <div>
-          <Typography variant='body-sm' tone='muted' className='mb-2'>
+          <Typography variant='body' className='mb-2'>
             Search
           </Typography>
           <Input
             type='text'
             placeholder='Search tasks...'
             value={filters.search}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, search: e.target.value }))
-            }
+            onChange={(e) => handleFilterChange("search", e.target.value)}
+            className='w-full'
           />
         </div>
 
         <div>
-          <Typography variant='body-sm' tone='muted' className='mb-2'>
+          <Typography variant='body' className='mb-2'>
             Status
           </Typography>
           <Select
+            options={statusOptions}
             value={filters.status}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                status: e.target.value as TaskStatus,
-              }))
-            }
-            options={[
-              { value: "", label: "All" },
-              { value: "todo", label: "To Do" },
-              { value: "in_progress", label: "In Progress" },
-              { value: "review", label: "Review" },
-              { value: "done", label: "Done" },
-            ]}
+            onChange={(value) => handleFilterChange("status", value)}
+            placeholder='All'
           />
         </div>
 
         <div>
-          <Typography variant='body-sm' tone='muted' className='mb-2'>
+          <Typography variant='body' className='mb-2'>
             Priority
           </Typography>
           <Select
+            options={priorityOptions}
             value={filters.priority}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                priority: e.target.value as TaskPriority,
-              }))
-            }
-            options={[
-              { value: "", label: "All" },
-              { value: "low", label: "Low" },
-              { value: "medium", label: "Medium" },
-              { value: "high", label: "High" },
-              { value: "urgent", label: "Urgent" },
-            ]}
+            onChange={(value) => handleFilterChange("priority", value)}
+            placeholder='All'
           />
         </div>
 
         <div>
-          <Typography variant='body-sm' tone='muted' className='mb-2'>
+          <Typography variant='body' className='mb-2'>
             Type
           </Typography>
           <Select
+            options={typeOptions}
             value={filters.type}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                type: e.target.value as TaskType,
-              }))
-            }
-            options={[
-              { value: "", label: "All" },
-              { value: "task", label: "Task" },
-              { value: "bug", label: "Bug" },
-              { value: "feature", label: "Feature" },
-              { value: "epic", label: "Epic" },
-            ]}
+            onChange={(value) => handleFilterChange("type", value)}
+            placeholder='All'
           />
         </div>
-      </div>
 
-      <div className='flex items-center gap-4'>
         <div>
-          <Typography variant='body-sm' tone='muted' className='mb-2'>
+          <Typography variant='body' className='mb-2'>
             Sort By
           </Typography>
           <Select
+            options={sortOptions}
             value={sortBy}
-            onChange={(e) =>
-              setSortBy(e.target.value as "dueDate" | "priority" | "createdAt")
-            }
-            options={[
-              { value: "dueDate", label: "Due Date" },
-              { value: "priority", label: "Priority" },
-              { value: "createdAt", label: "Created At" },
-            ]}
+            onChange={(value) => setSortBy(value as typeof sortBy)}
+            placeholder='Select sort field'
           />
         </div>
 
         <div>
-          <Typography variant='body-sm' tone='muted' className='mb-2'>
+          <Typography variant='body' className='mb-2'>
             Order
           </Typography>
-          <Select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-            options={[
-              { value: "asc", label: "Ascending" },
-              { value: "desc", label: "Descending" },
-            ]}
-          />
+          <Button
+            variant='secondary'
+            size='medium'
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+            leftIcon={
+              sortOrder === "asc" ? (
+                <ArrowUp className='w-4 h-4' />
+              ) : (
+                <ArrowDown className='w-4 h-4' />
+              )
+            }
+            fullWidth
+          >
+            {sortOrder === "asc" ? "Ascending" : "Descending"}
+          </Button>
         </div>
       </div>
     </div>
   );
 };
+
+export { TaskFilters };

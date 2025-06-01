@@ -1,74 +1,66 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import {
-  Task,
-  TaskStatus,
-  TaskPriority,
-  TaskType,
-  TaskFilters,
-  TaskSort,
-} from "@/types/task";
+import React from "react";
+import { useAuthStore } from "@/store/authStore";
 import { useTaskStore } from "@/store/taskStore";
-import { TaskCard } from "@/components/TaskCard";
 import { TaskForm } from "@/components/TaskForm";
-import { TimeTrackingChart } from "@/components/TimeTrackingChart";
+import { TaskFilters } from "@/components/TaskFilters";
 import { TaskStats } from "@/components/TaskStats";
-import { TaskFilters as TaskFiltersComponent } from "@/components/TaskFilters";
+import { TimeTrackingChart } from "@/components/TimeTrackingChart";
 import { Typography } from "@/components/core-ui/typography";
 import { Button } from "@/components/core-ui/button";
-import { Plus } from "lucide-react";
-import { useAuthStore } from "@/store/authStore";
+import { Task, TaskStatus, TaskPriority, TaskType } from "@/types/task";
 
-export default function Dashboard() {
-  const [showTaskForm, setShowTaskForm] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | undefined>();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Get auth state
+export default function DashboardPage() {
   const { user } = useAuthStore();
+  const { tasks, addTask, updateTask, deleteTask } = useTaskStore();
+  const [showTaskForm, setShowTaskForm] = React.useState(false);
+  const [editingTask, setEditingTask] = React.useState<
+    Partial<Task> | undefined
+  >();
+  const [filters, setFilters] = React.useState({
+    search: "",
+    status: "" as TaskStatus | "",
+    priority: "" as TaskPriority | "",
+    type: "" as TaskType | "",
+  });
+  const [sortBy, setSortBy] = React.useState<
+    "dueDate" | "priority" | "createdAt"
+  >("dueDate");
+  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
 
-  // Get store methods
-  const {
-    tasks,
-    filters,
-    sort,
-    deleteTask,
-    setFilters,
-    setSort,
-    getFilteredTasks,
-    initializeTaskStore,
-  } = useTaskStore();
+  const filteredTasks = React.useMemo(() => {
+    return tasks
+      .filter((task) => {
+        const matchesSearch =
+          task.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+          task.description.toLowerCase().includes(filters.search.toLowerCase());
+        const matchesStatus = !filters.status || task.status === filters.status;
+        const matchesPriority =
+          !filters.priority || task.priority === filters.priority;
+        const matchesType = !filters.type || task.type === filters.type;
+        return matchesSearch && matchesStatus && matchesPriority && matchesType;
+      })
+      .sort((a, b) => {
+        const aValue = a[sortBy];
+        const bValue = b[sortBy];
+        const modifier = sortOrder === "asc" ? 1 : -1;
+        return aValue < bValue
+          ? -1 * modifier
+          : aValue > bValue
+          ? 1 * modifier
+          : 0;
+      });
+  }, [tasks, filters, sortBy, sortOrder]);
 
-  // Initialize store
-  useEffect(() => {
-    const init = async () => {
-      try {
-        if (!user) {
-          throw new Error("User not authenticated");
-        }
-        await initializeTaskStore();
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Failed to initialize store:", error);
-        setError(
-          error instanceof Error ? error.message : "Failed to initialize store"
-        );
-        setIsLoading(false);
-      }
-    };
-    init();
-  }, [initializeTaskStore, user]);
-
-  const handleFilterChange = (newFilters: Partial<TaskFilters>) => {
-    setFilters({ ...filters, ...newFilters });
-  };
-
-  const handleSortChange = (field: keyof Task) => {
-    const newDirection =
-      sort.field === field && sort.direction === "asc" ? "desc" : "asc";
-    setSort({ field, direction: newDirection });
+  const handleTaskSubmit = (task: Partial<Task>) => {
+    if (editingTask?.id) {
+      updateTask(editingTask.id, task);
+    } else {
+      addTask(task);
+    }
+    setShowTaskForm(false);
+    setEditingTask(undefined);
   };
 
   const handleEditTask = (task: Task) => {
@@ -82,179 +74,157 @@ export default function Dashboard() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center min-h-screen'>
-        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600'></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className='flex items-center justify-center min-h-screen'>
-        <div className='text-red-600 text-center'>
-          <Typography variant='h2' className='mb-2'>
-            Error
-          </Typography>
-          <Typography variant='body'>{error}</Typography>
-        </div>
-      </div>
-    );
-  }
-
   if (!user) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
-        <div className='text-center'>
-          <Typography variant='h2' className='mb-2'>
-            Authentication Required
-          </Typography>
-          <Typography variant='body'>
-            Please log in to access the dashboard.
-          </Typography>
-        </div>
+        <Typography variant='h2'>
+          Please log in to view the dashboard
+        </Typography>
       </div>
     );
   }
 
-  const filteredTasks = getFilteredTasks();
-  const stats = {
-    total: tasks.length,
-    open: tasks.filter((t) => t.status === "open").length,
-    inProgress: tasks.filter((t) => t.status === "in_progress").length,
-    pending: tasks.filter((t) => t.status === "review").length,
-    closed: tasks.filter((t) => t.status === "closed").length,
-    highPriority: tasks.filter((t) => t.priority === "high").length,
-    overdue: tasks.filter((t) => new Date(t.dueDate) < new Date()).length,
-  };
-
   return (
-    <div className='p-6'>
-      <div className='max-w-7xl mx-auto'>
-        {/* Header */}
-        <div className='flex justify-between items-center mb-8'>
+    <div className='min-h-screen bg-gray-50'>
+      <div className='max-w-[2000px] mx-auto p-6'>
+        <div className='flex items-center justify-between mb-6'>
           <div>
-            <Typography variant='h1'>Task Dashboard</Typography>
-            <Typography variant='body' tone='muted' className='mt-1'>
-              Welcome back, {user.name} ({user.role})
+            <Typography variant='h1'>Welcome, {user.name}</Typography>
+            <Typography variant='body' tone='muted'>
+              {user.role === "manager"
+                ? "Manager Dashboard"
+                : "Developer Dashboard"}
             </Typography>
           </div>
-          <Button
-            variant='primary'
-            size='md'
-            icon={<Plus size={20} />}
-            onClick={() => {
-              setEditingTask(undefined);
-              setShowTaskForm(true);
-            }}
-          >
-            Create Task
-          </Button>
+          <Button onClick={() => setShowTaskForm(true)}>Create New Task</Button>
         </div>
 
-        {/* Overview Stats */}
         <TaskStats tasks={tasks} />
 
-        {/* Time Tracking Chart (for managers only) */}
         {user.role === "manager" && (
-          <div className='mb-8'>
-            <TimeTrackingChart
-              tasks={tasks}
-              isManager={user.role === "manager"}
-            />
+          <div className='mb-8 w-full'>
+            <TimeTrackingChart tasks={tasks} />
           </div>
         )}
 
-        {/* Filters and Search */}
-        <div className='bg-white p-6 rounded-lg shadow-sm mb-6'>
-          <TaskFiltersComponent
-            filters={{
-              search: filters.search || "",
-              status: filters.status || undefined,
-              priority: filters.priority || undefined,
-              type: filters.type || undefined,
-            }}
-            setFilters={(newFilters) => {
-              if (typeof newFilters === "function") {
-                const prev = {
-                  search: filters.search || "",
-                  status: filters.status || undefined,
-                  priority: filters.priority || undefined,
-                  type: filters.type || undefined,
-                };
-                const updated = newFilters(prev);
-                setFilters({
-                  ...filters,
-                  search: updated.search,
-                  status: updated.status,
-                  priority: updated.priority,
-                  type: updated.type,
-                });
-              } else {
-                setFilters({
-                  ...filters,
-                  search: newFilters.search,
-                  status: newFilters.status,
-                  priority: newFilters.priority,
-                  type: newFilters.type,
-                });
-              }
-            }}
-            sortBy={sort.field as "dueDate" | "priority" | "createdAt"}
-            setSortBy={(field) => setSort({ ...sort, field })}
-            sortOrder={sort.direction}
-            setSortOrder={(direction: "asc" | "desc") =>
-              setSort({ ...sort, direction })
-            }
-          />
-        </div>
+        <TaskFilters
+          filters={filters}
+          setFilters={setFilters}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          sortOrder={sortOrder}
+          setSortOrder={setSortOrder}
+        />
 
-        {/* Tasks List */}
-        <div className='space-y-4'>
-          {filteredTasks.length === 0 ? (
-            <div className='bg-white rounded-lg shadow-sm p-8'>
-              <div className='flex flex-col items-center justify-center space-y-2'>
-                <Typography variant='body' tone='muted'>
-                  No tasks found
-                </Typography>
-                <Typography variant='body-sm' tone='muted'>
-                  Try adjusting your filters or create a new task
-                </Typography>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          {filteredTasks.map((task) => (
+            <div
+              key={task.id}
+              className='bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow'
+            >
+              <div className='flex items-start justify-between mb-4'>
+                <div>
+                  <Typography variant='h3' className='mb-2'>
+                    {task.title}
+                  </Typography>
+                  <Typography variant='body' tone='muted' className='mb-4'>
+                    {task.description}
+                  </Typography>
+                </div>
+                <div className='flex gap-2'>
+                  <Button
+                    variant='secondary'
+                    size='sm'
+                    onClick={() => handleEditTask(task)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant='danger'
+                    size='sm'
+                    onClick={() => handleDeleteTask(task.id)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+              <div className='flex items-center gap-4'>
+                <div className='flex items-center gap-2'>
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      task.status === "done"
+                        ? "bg-green-500"
+                        : task.status === "in_progress"
+                        ? "bg-blue-500"
+                        : task.status === "review"
+                        ? "bg-yellow-500"
+                        : "bg-gray-500"
+                    }`}
+                  />
+                  <Typography variant='body' tone='muted'>
+                    {task.status.replace("_", " ")}
+                  </Typography>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      task.priority === "high"
+                        ? "bg-red-500"
+                        : task.priority === "medium"
+                        ? "bg-yellow-500"
+                        : "bg-green-500"
+                    }`}
+                  />
+                  <Typography variant='body' tone='muted'>
+                    {task.priority}
+                  </Typography>
+                </div>
               </div>
             </div>
-          ) : (
-            filteredTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onEdit={handleEditTask}
-                onDelete={handleDeleteTask}
-                userRole={user.role}
-              />
-            ))
-          )}
+          ))}
         </div>
-      </div>
 
-      {/* Task Form Modal */}
-      {showTaskForm && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
-          <div className='bg-white rounded-lg p-6 w-full max-w-2xl'>
-            <Typography variant='h2' className='mb-4'>
-              {editingTask ? "Edit Task" : "Create Task"}
-            </Typography>
-            <TaskForm
-              task={editingTask}
-              onCancel={() => {
-                setShowTaskForm(false);
-                setEditingTask(undefined);
-              }}
-              userRole={user.role}
-            />
+        {filteredTasks.length === 0 && (
+          <div className='bg-white rounded-lg shadow-sm p-8'>
+            <div className='flex flex-col items-center justify-center space-y-2'>
+              <Typography variant='h3'>No tasks found</Typography>
+              <Typography variant='body' tone='muted'>
+                Try adjusting your filters or create a new task
+              </Typography>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {showTaskForm && (
+          <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4'>
+            <div className='bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full'>
+              <div className='flex items-center justify-between mb-6'>
+                <Typography variant='h2'>
+                  {editingTask ? "Edit Task" : "Create New Task"}
+                </Typography>
+                <Button
+                  variant='secondary'
+                  size='sm'
+                  onClick={() => {
+                    setShowTaskForm(false);
+                    setEditingTask(undefined);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+              <TaskForm
+                task={editingTask}
+                onSubmit={handleTaskSubmit}
+                onCancel={() => {
+                  setShowTaskForm(false);
+                  setEditingTask(undefined);
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

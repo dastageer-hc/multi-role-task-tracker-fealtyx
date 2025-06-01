@@ -57,7 +57,7 @@ export default function DashboardLayout({
           </div>
 
           {/* Project Section */}
-          <div className='p-4 border-b border-gray-200'>
+          <div className='p-4 border-b border-gray-200 flex flex-col gap-1'>
             <Typography variant='label' tone='muted'>
               Project
             </Typography>

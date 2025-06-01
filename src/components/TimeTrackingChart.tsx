@@ -27,15 +27,11 @@ ChartJS.register(
 
 interface TimeTrackingChartProps {
   tasks: Task[];
-  isManager: boolean;
 }
 
 export const TimeTrackingChart: React.FC<TimeTrackingChartProps> = ({
   tasks = [],
-  isManager,
 }) => {
-  if (!isManager) return null;
-
   // Get the last 7 days
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();

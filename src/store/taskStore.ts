@@ -9,6 +9,8 @@ import {
   Attachment,
   TaskFilters,
   TaskSort,
+  TaskPriority,
+  TaskType,
 } from "@/types/task";
 import { startTimeTracking, stopTimeTracking } from "@/utils/timeTracking";
 
@@ -91,6 +93,9 @@ const createDummyTasks = (): Task[] => [
     timeEntries: [],
     totalTimeSpent: 0,
     attachments: [],
+    storyPoints: 0,
+    acceptanceCriteria: [],
+    testCases: [],
   },
   {
     id: "2",
@@ -109,6 +114,9 @@ const createDummyTasks = (): Task[] => [
     timeEntries: [],
     totalTimeSpent: 0,
     attachments: [],
+    storyPoints: 0,
+    acceptanceCriteria: [],
+    testCases: [],
   },
 ];
 
@@ -116,9 +124,9 @@ interface TaskState {
   tasks: Task[];
   filters: TaskFilters;
   sort: TaskSort;
-  addTask: (task: Omit<Task, "id" | "createdAt" | "updatedAt">) => void;
-  updateTask: (taskId: string, updates: Partial<Task>) => void;
-  deleteTask: (taskId: string) => void;
+  addTask: (task: Partial<Task>) => void;
+  updateTask: (id: string, task: Partial<Task>) => void;
+  deleteTask: (id: string) => void;
   updateTaskStatus: (taskId: string, newStatus: TaskStatus) => void;
   addComment: (
     taskId: string,
@@ -161,39 +169,51 @@ export const useTaskStore = create<TaskState>()(
       filters: {},
       sort: { field: "createdAt", direction: "desc" },
 
-      addTask: (task: Omit<Task, "id" | "createdAt" | "updatedAt">) =>
+      addTask: (taskData) =>
         set((state) => ({
           tasks: [
             ...state.tasks,
             {
-              ...task,
-              id: Date.now().toString(),
+              id: Math.random().toString(36).substr(2, 9),
+              title: taskData.title || "",
+              description: taskData.description || "",
+              status: taskData.status || "open",
+              priority: taskData.priority || "medium",
+              type: taskData.type || "feature",
+              dueDate:
+                taskData.dueDate || new Date().toISOString().split("T")[0],
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
+              estimatedHours: 0,
+              actualHours: 0,
+              tags: [],
               comments: [],
               timeEntries: [],
-              attachments: [],
               totalTimeSpent: 0,
-            },
+              attachments: [],
+              storyPoints: 0,
+              acceptanceCriteria: [],
+              testCases: [],
+            } as Task,
           ],
         })),
 
-      updateTask: (taskId: string, updates: Partial<Task>) =>
+      updateTask: (id, taskData) =>
         set((state) => ({
           tasks: state.tasks.map((task) =>
-            task.id === taskId
+            task.id === id
               ? {
                   ...task,
-                  ...updates,
+                  ...taskData,
                   updatedAt: new Date().toISOString(),
                 }
               : task
           ),
         })),
 
-      deleteTask: (taskId: string) =>
+      deleteTask: (id) =>
         set((state) => ({
-          tasks: state.tasks.filter((task) => task.id !== taskId),
+          tasks: state.tasks.filter((task) => task.id !== id),
         })),
 
       updateTaskStatus: (taskId: string, newStatus: TaskStatus) =>
@@ -485,7 +505,7 @@ export const useTaskStore = create<TaskState>()(
               ? {
                   ...task,
                   relatedTasks: task.relatedTasks?.filter(
-                    (rt) => rt !== relatedTaskId
+                    (rt: string) => rt !== relatedTaskId
                   ),
                   updatedAt: new Date().toISOString(),
                 }

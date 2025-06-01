@@ -19,6 +19,8 @@ import {
 export const Dashboard: React.FC = () => {
   const { tasks, filters, setFilters, sort, setSort } = useTaskStore();
   const { user } = useAuthStore();
+  const [showTaskForm, setShowTaskForm] = React.useState(false);
+  const [editingTask, setEditingTask] = React.useState<Task | undefined>();
 
   const filteredTasks = tasks.filter((task) => {
     if (filters.status && task.status !== filters.status) return false;
@@ -39,7 +41,6 @@ export const Dashboard: React.FC = () => {
     }
     if (sort.field === "priority") {
       const priorityOrder: Record<TaskPriority, number> = {
-        urgent: 4,
         high: 3,
         medium: 2,
         low: 1,
@@ -61,99 +62,102 @@ export const Dashboard: React.FC = () => {
     overdue: tasks.filter((t) => new Date(t.dueDate) < new Date()).length,
   };
 
-  const timeEntries = tasks.map((task) => ({
-    date: new Date(task.createdAt).toLocaleDateString(),
-    hours:
-      (task.timeEntries || []).reduce(
-        (sum, entry) => sum + (entry?.duration || 0),
-        0
-      ) / 60,
-  }));
-
   const handleEditTask = (task: Task) => {
-    // TODO: Implement task editing
+    setEditingTask(task);
+    setShowTaskForm(true);
   };
 
   const handleDeleteTask = (taskId: string) => {
-    // TODO: Implement task deletion
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      // TODO: Implement task deletion
+    }
+  };
+
+  const handlePriorityChange = (taskId: string, priority: string) => {
+    // TODO: Implement priority change
   };
 
   return (
     <div className='min-h-screen bg-gray-50'>
-      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
-          <div className='flex items-center justify-between'>
+      <main className='container mx-auto px-4 py-8'>
+        <div className='space-y-6'>
+          <div className='flex justify-between items-center'>
             <Typography variant='h1'>Dashboard</Typography>
             <Button
               variant='primary'
-              size='md'
-              icon={<Plus className='w-4 h-4' />}
+              size='medium'
               onClick={() => {
-                /* TODO: Implement task creation */
+                setEditingTask(undefined);
+                setShowTaskForm(true);
               }}
+              leftIcon={<Plus className='w-4 h-4' />}
             >
-              New Task
+              Add Task
             </Button>
           </div>
-        </div>
-      </div>
 
-      <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-        <div className='space-y-8'>
-          <TaskStats stats={stats} />
-          <TimeTrackingChart
-            timeEntries={timeEntries}
-            isManager={user?.role === "manager"}
-          />
-          <div className='space-y-4'>
-            <TaskFilters
-              filters={{
-                search: filters.search || "",
-                status: filters.status || "",
-                priority: filters.priority || "",
-                type: filters.type || "",
-              }}
-              setFilters={(newFilters) => {
-                if (typeof newFilters === "function") {
-                  const prev = {
-                    search: filters.search || "",
-                    status: filters.status || "",
-                    priority: filters.priority || "",
-                    type: filters.type || "",
-                  };
-                  const updated = newFilters(prev);
-                  setFilters({
-                    ...filters,
-                    search: updated.search,
-                    status: updated.status as TaskStatus | undefined,
-                    priority: updated.priority as TaskPriority | undefined,
-                    type: updated.type as TaskType | undefined,
-                  });
-                } else {
-                  setFilters({
-                    ...filters,
-                    search: newFilters.search,
-                    status: newFilters.status as TaskStatus | undefined,
-                    priority: newFilters.priority as TaskPriority | undefined,
-                    type: newFilters.type as TaskType | undefined,
-                  });
-                }
-              }}
-              sortBy={sort.field as "dueDate" | "priority" | "createdAt"}
-              setSortBy={(field) => setSort({ ...sort, field })}
-              sortOrder={sort.direction}
-              setSortOrder={(direction) => setSort({ ...sort, direction })}
-            />
-            <div className='grid grid-cols-1 gap-4'>
-              {sortedTasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  onEdit={handleEditTask}
-                  onDelete={handleDeleteTask}
-                  userRole={user?.role || "developer"}
-                />
-              ))}
+          <TaskStats tasks={tasks} />
+
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+            <div className='lg:col-span-2 space-y-4'>
+              <TaskFilters
+                filters={{
+                  search: filters.search || "",
+                  status: filters.status || "",
+                  priority: filters.priority || "",
+                  type: filters.type || "",
+                }}
+                setFilters={(newFilters) => {
+                  if (typeof newFilters === "function") {
+                    const prev = {
+                      search: filters.search || "",
+                      status: filters.status || "",
+                      priority: filters.priority || "",
+                      type: filters.type || "",
+                    };
+                    const updated = newFilters(prev);
+                    setFilters({
+                      ...filters,
+                      search: updated.search,
+                      status: updated.status as TaskStatus | undefined,
+                      priority: updated.priority as TaskPriority | undefined,
+                      type: updated.type as TaskType | undefined,
+                    });
+                  } else {
+                    setFilters({
+                      ...filters,
+                      search: newFilters.search,
+                      status: newFilters.status as TaskStatus | undefined,
+                      priority: newFilters.priority as TaskPriority | undefined,
+                      type: newFilters.type as TaskType | undefined,
+                    });
+                  }
+                }}
+                sortBy={sort.field as "dueDate" | "priority" | "createdAt"}
+                setSortBy={(field) => setSort({ ...sort, field })}
+                sortOrder={sort.direction}
+                setSortOrder={(direction) => setSort({ ...sort, direction })}
+              />
+              <div className='grid grid-cols-1 gap-4'>
+                {sortedTasks.map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onEdit={handleEditTask}
+                    onDelete={handleDeleteTask}
+                    onPriorityChange={handlePriorityChange}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className='space-y-6'>
+              <div className='bg-white rounded-lg shadow-sm p-4'>
+                <Typography variant='h3' className='mb-4'>
+                  Time Tracking
+                </Typography>
+                <TimeTrackingChart tasks={tasks} />
+              </div>
             </div>
           </div>
         </div>

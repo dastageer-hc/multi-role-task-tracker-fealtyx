@@ -1,6 +1,6 @@
 export type TaskStatus = "open" | "in_progress" | "review" | "closed";
-export type TaskPriority = "low" | "medium" | "high" | "urgent";
-export type TaskType = "feature" | "bug" | "task" | "epic";
+export type TaskPriority = "low" | "medium" | "high";
+export type TaskType = "feature" | "bug" | "improvement";
 
 export interface User {
   id: string;
@@ -43,10 +43,9 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  type: TaskType;
   status: TaskStatus;
   priority: TaskPriority;
-  assignee?: User;
+  type: TaskType;
   dueDate: string;
   createdAt: string;
   updatedAt: string;
@@ -55,17 +54,17 @@ export interface Task {
   tags: string[];
   comments: Comment[];
   timeEntries: TimeEntry[];
-  totalTimeSpent: number; // in minutes
+  totalTimeSpent: number;
   attachments: Attachment[];
+  storyPoints: number;
+  acceptanceCriteria: string[];
+  testCases: string[];
+  assignee?: User;
   parentTaskId?: string;
   subtasks?: Task[];
-  dependencies?: string[]; // Array of task IDs
+  dependencies?: string[];
+  relatedTasks?: string[];
   sprintId?: string;
-  storyPoints?: number;
-  acceptanceCriteria?: string[];
-  testCases?: string[];
-  relatedTasks?: string[]; // Array of task IDs
-  customFields?: Record<string, any>;
 }
 
 export interface TaskFilters {

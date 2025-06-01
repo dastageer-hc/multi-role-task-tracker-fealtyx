@@ -21,8 +21,6 @@ export const TaskStats: React.FC<TaskStatsProps> = ({ tasks = [] }) => {
     review:
       tasks?.filter((task) => task.status === ("review" as TaskStatus))
         .length || 0,
-    highPriority: tasks?.filter((task) => task.priority === "high").length || 0,
-    urgent: tasks?.filter((task) => task.priority === "urgent").length || 0,
   };
 
   return (
@@ -83,28 +81,6 @@ export const TaskStats: React.FC<TaskStatsProps> = ({ tasks = [] }) => {
           </div>
           <Typography variant='body-sm' tone='muted'>
             In Review
-          </Typography>
-        </div>
-
-        <div className='bg-orange-50 rounded-lg p-4 flex items-center gap-4'>
-          <div className='w-12 h-12 rounded-full bg-orange-200 flex items-center justify-center'>
-            <Typography variant='h2' className='text-orange-600'>
-              {stats.highPriority}
-            </Typography>
-          </div>
-          <Typography variant='body-sm' tone='muted'>
-            High Priority
-          </Typography>
-        </div>
-
-        <div className='bg-red-50 rounded-lg p-4 flex items-center gap-4'>
-          <div className='w-12 h-12 rounded-full bg-red-200 flex items-center justify-center'>
-            <Typography variant='h2' className='text-red-600'>
-              {stats.urgent}
-            </Typography>
-          </div>
-          <Typography variant='body-sm' tone='muted'>
-            Urgent
           </Typography>
         </div>
 

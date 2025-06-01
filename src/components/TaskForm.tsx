@@ -1,301 +1,156 @@
-import React, { useState } from "react";
-import { Task, TaskType, TaskStatus, TaskPriority } from "@/types/task";
-import { statusConfig, priorityConfig } from "@/utils/taskConfig";
-import { useTaskStore } from "@/store/taskStore";
+import React from "react";
+import { Typography } from "./core-ui/typography";
+import { Input } from "./core-ui/input";
+import { Select } from "./core-ui/select";
+import { Task, TaskStatus, TaskPriority, TaskType } from "@/types/task";
 
 interface TaskFormProps {
-  task?: Task;
+  task?: Partial<Task>;
+  onSubmit: (task: Partial<Task>) => void;
   onCancel: () => void;
-  userRole: "manager" | "developer";
 }
 
+const statusOptions = [
+  { value: "todo", label: "To Do" },
+  { value: "in_progress", label: "In Progress" },
+  { value: "review", label: "Review" },
+  { value: "done", label: "Done" },
+];
+
+const priorityOptions = [
+  { value: "low", label: "Low" },
+  { value: "medium", label: "Medium" },
+  { value: "high", label: "High" },
+];
+
+const typeOptions = [
+  { value: "feature", label: "Feature" },
+  { value: "bug", label: "Bug" },
+  { value: "improvement", label: "Improvement" },
+];
+
 export const TaskForm: React.FC<TaskFormProps> = ({
-  task,
+  task = {},
+  onSubmit,
   onCancel,
-  userRole,
 }) => {
-  const [showAdvancedFields, setShowAdvancedFields] = useState(false);
-  const addTask = useTaskStore((state) => state.addTask);
-  const updateTask = useTaskStore((state) => state.updateTask);
-
-  const [formData, setFormData] = useState<Partial<Task>>(
-    task || {
-      title: "",
-      description: "",
-      type: "task",
-      status: "open",
-      priority: "medium",
-      dueDate: new Date().toISOString().split("T")[0],
-      estimatedHours: 0,
-      tags: [],
-      comments: [],
-      timeEntries: [],
-      totalTimeSpent: 0,
-      attachments: [],
-    }
-  );
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const tags = e.target.value.split(",").map((tag) => tag.trim());
-    setFormData({ ...formData, tags });
-  };
-
-  const handleAcceptanceCriteriaChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    const criteria = e.target.value.split("\n").filter((line) => line.trim());
-    setFormData({ ...formData, acceptanceCriteria: criteria });
-  };
+  const [formData, setFormData] = React.useState<Partial<Task>>({
+    title: task.title || "",
+    description: task.description || "",
+    status: task.status || ("todo" as TaskStatus),
+    priority: task.priority || "medium",
+    type: task.type || "feature",
+    dueDate: task.dueDate || new Date().toISOString().split("T")[0],
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.description || !formData.dueDate) {
-      return;
-    }
-
-    const taskData: Omit<Task, "id" | "createdAt" | "updatedAt"> = {
-      title: formData.title,
-      description: formData.description,
-      type: formData.type || "task",
-      status: formData.status || "open",
-      priority: formData.priority || "medium",
-      dueDate: formData.dueDate,
-      estimatedHours: formData.estimatedHours || 0,
-      actualHours: formData.actualHours || 0,
-      tags: formData.tags || [],
-      comments: formData.comments || [],
-      timeEntries: formData.timeEntries || [],
-      totalTimeSpent: formData.totalTimeSpent || 0,
-      attachments: formData.attachments || [],
-      storyPoints: formData.storyPoints,
-      acceptanceCriteria: formData.acceptanceCriteria,
-      testCases: formData.testCases,
-    };
-
-    if (task) {
-      updateTask(task.id, taskData);
-    } else {
-      addTask(taskData);
-    }
-    onCancel();
+    onSubmit(formData);
   };
 
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
-      {/* Basic Fields */}
       <div>
-        <label className='block text-sm font-medium text-gray-700'>Title</label>
-        <input
+        <Typography variant='body' tone='muted' className='mb-2'>
+          Title
+        </Typography>
+        <Input
           type='text'
-          name='title'
-          value={formData.title || ""}
-          onChange={handleChange}
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          placeholder='Enter task title'
           required
         />
       </div>
 
       <div>
-        <label className='block text-sm font-medium text-gray-700'>
+        <Typography variant='body' tone='muted' className='mb-2'>
           Description
-        </label>
+        </Typography>
         <textarea
-          name='description'
-          value={formData.description || ""}
-          onChange={handleChange}
-          rows={3}
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          required
+          value={formData.description}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
+          placeholder='Enter task description'
+          className='w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+          rows={4}
         />
       </div>
 
       <div className='grid grid-cols-2 gap-4'>
         <div>
-          <label className='block text-sm font-medium text-gray-700'>
-            Type
-          </label>
-          <select
-            name='type'
-            value={formData.type || "task"}
-            onChange={handleChange}
-            className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          >
-            <option value='task'>Task</option>
-            <option value='bug'>Bug</option>
-            <option value='feature'>Feature</option>
-            <option value='epic'>Epic</option>
-          </select>
-        </div>
-
-        <div>
-          <label className='block text-sm font-medium text-gray-700'>
-            Priority
-          </label>
-          <select
-            name='priority'
-            value={formData.priority || "medium"}
-            onChange={handleChange}
-            className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          >
-            {Object.entries(priorityConfig).map(([value, { label }]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {!task && (
-        <div>
-          <label className='block text-sm font-medium text-gray-700'>
+          <Typography variant='body' tone='muted' className='mb-2'>
             Status
-          </label>
-          <select
-            name='status'
-            value={formData.status || "open"}
-            onChange={handleChange}
-            className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          >
-            {Object.entries(statusConfig).map(([value, { label }]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
+          </Typography>
+          <Select
+            options={statusOptions}
+            value={formData.status || ""}
+            onChange={(value) =>
+              setFormData({ ...formData, status: value as TaskStatus })
+            }
+            placeholder='Select status'
+          />
         </div>
-      )}
 
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>
-          Due Date
-        </label>
-        <input
-          type='date'
-          name='dueDate'
-          value={formData.dueDate?.split("T")[0] || ""}
-          onChange={handleChange}
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          required
-        />
-      </div>
-
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>
-          Estimated Hours
-        </label>
-        <input
-          type='number'
-          name='estimatedHours'
-          value={formData.estimatedHours || ""}
-          onChange={handleChange}
-          min='0'
-          step='0.5'
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          required
-        />
-      </div>
-
-      <div>
-        <label className='block text-sm font-medium text-gray-700'>
-          Tags (comma-separated)
-        </label>
-        <input
-          type='text'
-          name='tags'
-          value={formData.tags?.join(", ") || ""}
-          onChange={handleTagsChange}
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-          placeholder='e.g., frontend, bug, urgent'
-        />
-      </div>
-
-      {/* Advanced Fields Toggle */}
-      <div className='flex items-center justify-between'>
-        <button
-          type='button'
-          onClick={() => setShowAdvancedFields(!showAdvancedFields)}
-          className='text-sm text-blue-600 hover:text-blue-800'
-        >
-          {showAdvancedFields ? "Hide Advanced Fields" : "Show Advanced Fields"}
-        </button>
-      </div>
-
-      {/* Advanced Fields */}
-      {showAdvancedFields && (
-        <div className='space-y-4 border-t pt-4'>
-          <div>
-            <label className='block text-sm font-medium text-gray-700'>
-              Story Points
-            </label>
-            <input
-              type='number'
-              name='storyPoints'
-              value={formData.storyPoints || ""}
-              onChange={handleChange}
-              min='0'
-              className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-            />
-          </div>
-
-          <div>
-            <label className='block text-sm font-medium text-gray-700'>
-              Acceptance Criteria
-            </label>
-            <textarea
-              name='acceptanceCriteria'
-              value={formData.acceptanceCriteria?.join("\n") || ""}
-              onChange={handleAcceptanceCriteriaChange}
-              rows={3}
-              className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-              placeholder='Enter each criterion on a new line'
-            />
-          </div>
-
-          <div>
-            <label className='block text-sm font-medium text-gray-700'>
-              Test Cases
-            </label>
-            <textarea
-              name='testCases'
-              value={formData.testCases?.join("\n") || ""}
-              onChange={(e) => {
-                const testCases = e.target.value
-                  .split("\n")
-                  .filter((line) => line.trim());
-                setFormData({ ...formData, testCases });
-              }}
-              rows={3}
-              className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-              placeholder='Enter each test case on a new line'
-            />
-          </div>
+        <div>
+          <Typography variant='body' tone='muted' className='mb-2'>
+            Priority
+          </Typography>
+          <Select
+            options={priorityOptions}
+            value={formData.priority || ""}
+            onChange={(value) =>
+              setFormData({ ...formData, priority: value as TaskPriority })
+            }
+            placeholder='Select priority'
+          />
         </div>
-      )}
 
-      {/* Form Actions */}
-      <div className='flex justify-end space-x-3 pt-4'>
+        <div>
+          <Typography variant='body' tone='muted' className='mb-2'>
+            Type
+          </Typography>
+          <Select
+            options={typeOptions}
+            value={formData.type || ""}
+            onChange={(value) =>
+              setFormData({ ...formData, type: value as TaskType })
+            }
+            placeholder='Select type'
+          />
+        </div>
+
+        <div>
+          <Typography variant='body' tone='muted' className='mb-2'>
+            Due Date
+          </Typography>
+          <Input
+            type='date'
+            value={formData.dueDate}
+            onChange={(e) =>
+              setFormData({ ...formData, dueDate: e.target.value })
+            }
+            required
+          />
+        </div>
+      </div>
+
+      <div className='flex justify-end gap-2 pt-4'>
         <button
           type='button'
           onClick={onCancel}
-          className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+          className='px-4 py-2 text-gray-600 hover:text-gray-800'
         >
-          Cancel
+          <Typography variant='body'>Cancel</Typography>
         </button>
         <button
           type='submit'
-          className='px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+          className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700'
         >
-          {task ? "Update Task" : "Create Task"}
+          <Typography variant='body' tone='white'>
+            {task.id ? "Update Task" : "Create Task"}
+          </Typography>
         </button>
       </div>
     </form>
