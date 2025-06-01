@@ -8,10 +8,9 @@ export interface User {
 
 export interface AuthState {
   user: User | null;
-  setUser: (user: User | null) => void;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => void;
-  initializeAuth: () => void;
+  initializeAuth: () => Promise<void>;
 }

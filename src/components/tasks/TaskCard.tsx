@@ -5,7 +5,6 @@ import { Tag } from "../core-ui/tag";
 import { StatusSelect } from "../core-ui/status-select";
 import { Calendar, Clock, Edit2, Trash2, User } from "lucide-react";
 import {
-  getTaskStatusConfig,
   getTaskPriorityConfig,
   getTaskTypeConfig,
 } from "../../utils/taskUtils";
@@ -33,7 +32,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onStatusChange,
 }) => {
   const { user } = useAuthStore();
-  const taskStatusConfig = getTaskStatusConfig(task.status);
   const taskPriorityConfig = getTaskPriorityConfig(task.priority);
   const taskTypeConfig = getTaskTypeConfig(task.type);
 

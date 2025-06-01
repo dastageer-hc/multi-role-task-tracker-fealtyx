@@ -9,10 +9,7 @@ import {
   Attachment,
   TaskFilters,
   TaskSort,
-  TaskPriority,
-  TaskType,
 } from "@/types/task";
-import { startTimeTracking, stopTimeTracking } from "@/utils/timeTracking";
 import { useAuthStore } from "@/store/authStore";
 
 const STORAGE_KEYS = {
@@ -20,9 +17,6 @@ const STORAGE_KEYS = {
   TASK_FILTERS: "task-filters",
   TASK_SORT: "task-sort",
 } as const;
-
-// Helper function to generate unique IDs
-const generateId = () => Math.random().toString(36).substr(2, 9);
 
 // Helper function to calculate total time spent
 const calculateTotalTime = (timeEntries: TimeEntry[]): number => {
@@ -534,7 +528,7 @@ export const useTaskStore = create<TaskState>()(
         })),
 
       setSort: (sort: TaskSort) =>
-        set((state) => ({
+        set(() => ({
           sort,
         })),
 

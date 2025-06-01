@@ -30,14 +30,10 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const success = await login(email, password);
-      if (success) {
-        router.push("/dashboard");
-      } else {
-        setError("Invalid email or password");
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
+      await login({ email, password });
+      router.push("/dashboard");
+    } catch {
+      setError("Invalid credentials");
     } finally {
       setIsSubmitting(false);
     }
