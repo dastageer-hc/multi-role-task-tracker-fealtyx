@@ -4,7 +4,7 @@ import { TaskStatus, TaskPriority, TaskType } from "@/types/task";
 import { Input } from "../core-ui/input";
 import { Select } from "../core-ui/select";
 import { Button } from "../core-ui/button";
-import { ArrowUp, ArrowDown, Filter, SortAsc, SortDesc } from "lucide-react";
+import { SortAsc, SortDesc } from "lucide-react";
 
 interface TaskFiltersProps {
   filters: {
@@ -145,8 +145,6 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
             </Button>
           </div>
         </div>
-
-       
       </div>
     </div>
   );

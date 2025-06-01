@@ -19,23 +19,23 @@ const STORAGE_KEYS = {
 } as const;
 
 // Helper function to calculate total time spent
-const calculateTotalTime = (timeEntries: TimeEntry[]): number => {
-  return timeEntries.reduce((total, entry) => {
-    if (entry.duration) {
-      return total + entry.duration;
-    }
-    if (entry.startTime && entry.endTime) {
-      const duration =
-        new Date(entry.endTime).getTime() - new Date(entry.startTime).getTime();
-      return total + Math.floor(duration / (1000 * 60)); // Convert to minutes
-    }
-    return total;
-  }, 0);
-};
+// const calculateTotalTime = (timeEntries: TimeEntry[]): number => {
+//   return timeEntries.reduce((total, entry) => {
+//     if (entry.duration) {
+//       return total + entry.duration;
+//     }
+//     if (entry.startTime && entry.endTime) {
+//       const duration =
+//         new Date(entry.endTime).getTime() - new Date(entry.startTime).getTime();
+//       return total + Math.floor(duration / (1000 * 60)); // Convert to minutes
+//     }
+//     return total;
+//   }, 0);
+// };
 
 // LocalStorage helper functions
 const storage = {
-  setItem: (key: string, value: any) => {
+  setItem: (key: string, value: unknown) => {
     try {
       if (typeof window !== "undefined") {
         localStorage.setItem(key, JSON.stringify(value));
