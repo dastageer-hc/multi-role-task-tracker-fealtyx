@@ -154,21 +154,14 @@ export default function Dashboard() {
         </div>
 
         {/* Overview Stats */}
-        <TaskStats stats={stats} />
+        <TaskStats tasks={tasks} />
 
         {/* Time Tracking Chart (for managers only) */}
         {user.role === "manager" && (
           <div className='mb-8'>
             <TimeTrackingChart
-              timeEntries={tasks.map((task) => ({
-                date: new Date(task.createdAt).toLocaleDateString(),
-                hours:
-                  (task.timeEntries || []).reduce(
-                    (sum, entry) => sum + (entry?.duration || 0),
-                    0
-                  ) / 60,
-              }))}
-              isManager={true}
+              tasks={tasks}
+              isManager={user.role === "manager"}
             />
           </div>
         )}
@@ -178,33 +171,33 @@ export default function Dashboard() {
           <TaskFiltersComponent
             filters={{
               search: filters.search || "",
-              status: filters.status || "",
-              priority: filters.priority || "",
-              type: filters.type || "",
+              status: filters.status || undefined,
+              priority: filters.priority || undefined,
+              type: filters.type || undefined,
             }}
             setFilters={(newFilters) => {
               if (typeof newFilters === "function") {
                 const prev = {
                   search: filters.search || "",
-                  status: filters.status || "",
-                  priority: filters.priority || "",
-                  type: filters.type || "",
+                  status: filters.status || undefined,
+                  priority: filters.priority || undefined,
+                  type: filters.type || undefined,
                 };
                 const updated = newFilters(prev);
                 setFilters({
                   ...filters,
                   search: updated.search,
-                  status: updated.status as TaskStatus | undefined,
-                  priority: updated.priority as TaskPriority | undefined,
-                  type: updated.type as TaskType | undefined,
+                  status: updated.status,
+                  priority: updated.priority,
+                  type: updated.type,
                 });
               } else {
                 setFilters({
                   ...filters,
                   search: newFilters.search,
-                  status: newFilters.status as TaskStatus | undefined,
-                  priority: newFilters.priority as TaskPriority | undefined,
-                  type: newFilters.type as TaskType | undefined,
+                  status: newFilters.status,
+                  priority: newFilters.priority,
+                  type: newFilters.type,
                 });
               }
             }}
@@ -220,13 +213,15 @@ export default function Dashboard() {
         {/* Tasks List */}
         <div className='space-y-4'>
           {filteredTasks.length === 0 ? (
-            <div className='text-center py-12'>
-              <Typography variant='body' tone='muted' className='mb-2'>
-                No tasks found
-              </Typography>
-              <Typography variant='body-sm' tone='muted'>
-                Try adjusting your filters or create a new task
-              </Typography>
+            <div className='bg-white rounded-lg shadow-sm p-8'>
+              <div className='flex flex-col items-center justify-center space-y-2'>
+                <Typography variant='body' tone='muted'>
+                  No tasks found
+                </Typography>
+                <Typography variant='body-sm' tone='muted'>
+                  Try adjusting your filters or create a new task
+                </Typography>
+              </div>
             </div>
           ) : (
             filteredTasks.map((task) => (

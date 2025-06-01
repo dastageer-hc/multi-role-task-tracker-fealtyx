@@ -17,6 +17,7 @@ import {
 import { useTaskStore } from "@/store/taskStore";
 import { Typography } from "./core-ui/typography";
 import { Tag } from "./core-ui/tag";
+import { Button } from "./core-ui/button";
 
 interface TaskCardProps {
   task: Task;
@@ -109,47 +110,55 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         {/* Status and Actions */}
         <div className='mt-4 flex items-center justify-between'>
           <div className='flex items-center gap-4'>
-            <select
-              value={task.status}
-              onChange={handleStatusChange}
-              className={`px-3 py-1 rounded-full text-sm font-medium ${
-                taskStatusConfig?.color || "bg-gray-100 text-gray-800"
-              }`}
-              disabled={userRole === "developer" && task.status === "closed"}
-            >
-              {Object.entries(statusConfig).map(([value, { label }]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-
-            <div className='flex items-center text-sm text-gray-500'>
-              <Clock size={16} className='mr-1' />
-              {formatDistanceToNow(new Date(task.dueDate), { addSuffix: true })}
+            <div className='flex items-center gap-2'>
+              <Typography variant='body-sm' tone='muted'>
+                Status:
+              </Typography>
+              <Tag
+                label={taskStatusConfig.label}
+                variant={
+                  taskStatusConfig.color === "bg-red-100"
+                    ? "danger"
+                    : taskStatusConfig.color === "bg-yellow-100"
+                    ? "warning"
+                    : taskStatusConfig.color === "bg-green-100"
+                    ? "success"
+                    : taskStatusConfig.color === "bg-blue-100"
+                    ? "info"
+                    : "default"
+                }
+              />
             </div>
-
-            {isOverdue && (
-              <div className='flex items-center text-sm text-red-500'>
-                <AlertCircle size={16} className='mr-1' />
-                Overdue
-              </div>
-            )}
+            <div className='flex items-center gap-2'>
+              <Typography variant='body-sm' tone='muted'>
+                Due:
+              </Typography>
+              <Typography variant='body-sm'>
+                {new Date(task.dueDate).toLocaleDateString()}
+              </Typography>
+            </div>
           </div>
-
           <div className='flex items-center gap-2'>
-            <button
-              onClick={() => onEdit(task)}
-              className='p-1 hover:bg-gray-100 rounded-full text-gray-500 hover:text-gray-700'
-            >
-              <Edit size={18} />
-            </button>
-            <button
-              onClick={() => onDelete(task.id)}
-              className='p-1 hover:bg-gray-100 rounded-full text-gray-500 hover:text-red-600'
-            >
-              <Trash2 size={18} />
-            </button>
+            {userRole === "manager" && (
+              <>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={() => onEdit(task)}
+                  icon={<Edit size={16} />}
+                >
+                  <Typography variant='body-sm'>Edit</Typography>
+                </Button>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={() => onDelete(task.id)}
+                  icon={<Trash2 size={16} />}
+                >
+                  <Typography variant='body-sm'>Delete</Typography>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -163,19 +172,17 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               Time Tracking
             </Typography>
             <div className='grid grid-cols-2 gap-4'>
-              <div>
+              <div className='flex items-center gap-2'>
                 <Typography variant='body-sm' tone='muted'>
                   Estimated:
                 </Typography>
-                <Typography variant='body' className='ml-2'>
-                  {task.estimatedHours}h
-                </Typography>
+                <Typography variant='body'>{task.estimatedHours}h</Typography>
               </div>
-              <div>
+              <div className='flex items-center gap-2'>
                 <Typography variant='body-sm' tone='muted'>
                   Spent:
                 </Typography>
-                <Typography variant='body' className='ml-2'>
+                <Typography variant='body'>
                   {Math.round(task.totalTimeSpent / 60)}h
                 </Typography>
               </div>
@@ -188,7 +195,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               <Typography variant='h3' className='mb-2'>
                 Acceptance Criteria
               </Typography>
-              <ul className='list-disc list-inside'>
+              <ul className='list-disc list-inside space-y-1'>
                 {task.acceptanceCriteria.map((criterion, index) => (
                   <li key={index}>
                     <Typography variant='body'>{criterion}</Typography>
@@ -200,55 +207,33 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
           {/* Comments Section */}
           <div>
-            <button
-              onClick={() => setShowComments(!showComments)}
-              className='flex items-center text-sm text-gray-500 hover:text-gray-700'
-            >
-              <MessageSquare size={16} className='mr-1' />
-              <Typography variant='body-sm'>
-                Comments ({task.comments?.length || 0})
-              </Typography>
-            </button>
-
-            {showComments && (
-              <div className='mt-2'>
-                {/* Comments List */}
-                <div className='space-y-3 mb-4'>
-                  {task.comments?.map((comment) => (
-                    <div key={comment.id} className='bg-gray-50 p-3 rounded-lg'>
-                      <div className='flex items-center justify-between mb-1'>
-                        <Typography variant='body-sm' className='font-medium'>
-                          {comment.authorName}
-                        </Typography>
-                        <Typography variant='body-sm' tone='muted'>
-                          {formatDistanceToNow(new Date(comment.createdAt), {
-                            addSuffix: true,
-                          })}
-                        </Typography>
-                      </div>
-                      <Typography variant='body'>{comment.content}</Typography>
+            <Typography variant='h3' className='mb-2'>
+              Comments
+            </Typography>
+            <div className='space-y-4'>
+              {task.comments?.map((comment, index) => (
+                <div key={index} className='flex gap-3'>
+                  <div className='w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center'>
+                    <Typography variant='body-sm' className='font-medium'>
+                      {comment.authorId.charAt(0)}
+                    </Typography>
+                  </div>
+                  <div className='flex-1'>
+                    <div className='flex items-center gap-2'>
+                      <Typography variant='body-sm' className='font-medium'>
+                        {comment.authorId}
+                      </Typography>
+                      <Typography variant='body-sm' tone='muted'>
+                        {new Date(comment.createdAt).toLocaleString()}
+                      </Typography>
                     </div>
-                  ))}
+                    <Typography variant='body' className='mt-1'>
+                      {comment.content}
+                    </Typography>
+                  </div>
                 </div>
-
-                {/* Add Comment Form */}
-                <form onSubmit={handleAddComment} className='mt-4'>
-                  <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder='Add a comment...'
-                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-                    rows={2}
-                  />
-                  <button
-                    type='submit'
-                    className='mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700'
-                  >
-                    Add Comment
-                  </button>
-                </form>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
 
           {/* Attachments */}

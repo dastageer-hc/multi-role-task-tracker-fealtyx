@@ -12,24 +12,14 @@ import {
 } from "@/types/task";
 
 interface TaskFiltersProps {
-  filters: {
-    search: string;
-    status: string;
-    priority: string;
-    type: string;
-  };
-  setFilters: React.Dispatch<
-    React.SetStateAction<{
-      search: string;
-      status: string;
-      priority: string;
-      type: string;
-    }>
-  >;
+  filters: TaskFiltersType;
+  setFilters: (
+    filters: TaskFiltersType | ((prev: TaskFiltersType) => TaskFiltersType)
+  ) => void;
   sortBy: "dueDate" | "priority" | "createdAt";
-  setSortBy: (value: "dueDate" | "priority" | "createdAt") => void;
+  setSortBy: (sortBy: "dueDate" | "priority" | "createdAt") => void;
   sortOrder: "asc" | "desc";
-  setSortOrder: (value: "asc" | "desc") => void;
+  setSortOrder: (sortOrder: "asc" | "desc") => void;
 }
 
 export const TaskFilters: React.FC<TaskFiltersProps> = ({
@@ -41,17 +31,14 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
   setSortOrder,
 }) => {
   return (
-    <div className='space-y-4'>
-      <div className='flex items-center gap-2'>
-        <Filter size={16} className='text-gray-500' />
-        <Typography variant='label' tone='muted'>
-          Filters & Sorting
-        </Typography>
-      </div>
-      <div className='flex flex-wrap gap-4 items-center'>
-        <div className='flex-1 min-w-64'>
+    <div className='bg-white rounded-lg shadow-sm p-4 space-y-4'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+        <div>
+          <Typography variant='body-sm' tone='muted' className='mb-2'>
+            Search
+          </Typography>
           <Input
-            icon={<Search size={16} className='text-gray-400' />}
+            type='text'
             placeholder='Search tasks...'
             value={filters.search}
             onChange={(e) =>
@@ -60,50 +47,78 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
           />
         </div>
 
-        <Select
-          value={filters.status}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, status: e.target.value }))
-          }
-          options={[
-            { value: "", label: "All Status" },
-            ...Object.entries(statusConfig).map(([key, config]) => ({
-              value: key,
-              label: config.label,
-            })),
-          ]}
-          className='w-[20rem]'
-        />
+        <div>
+          <Typography variant='body-sm' tone='muted' className='mb-2'>
+            Status
+          </Typography>
+          <Select
+            value={filters.status}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                status: e.target.value as TaskStatus,
+              }))
+            }
+            options={[
+              { value: "", label: "All" },
+              { value: "todo", label: "To Do" },
+              { value: "in_progress", label: "In Progress" },
+              { value: "review", label: "Review" },
+              { value: "done", label: "Done" },
+            ]}
+          />
+        </div>
 
-        <Select
-          value={filters.priority}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, priority: e.target.value }))
-          }
-          options={[
-            { value: "", label: "All Priority" },
-            ...Object.entries(priorityConfig).map(([key, config]) => ({
-              value: key,
-              label: config.label,
-            })),
-          ]}
-        />
+        <div>
+          <Typography variant='body-sm' tone='muted' className='mb-2'>
+            Priority
+          </Typography>
+          <Select
+            value={filters.priority}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                priority: e.target.value as TaskPriority,
+              }))
+            }
+            options={[
+              { value: "", label: "All" },
+              { value: "low", label: "Low" },
+              { value: "medium", label: "Medium" },
+              { value: "high", label: "High" },
+              { value: "urgent", label: "Urgent" },
+            ]}
+          />
+        </div>
 
-        <Select
-          value={filters.type}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, type: e.target.value }))
-          }
-          options={[
-            { value: "", label: "All Types" },
-            { value: "task", label: "Task" },
-            { value: "bug", label: "Bug" },
-            { value: "feature", label: "Feature" },
-            { value: "epic", label: "Epic" },
-          ]}
-        />
+        <div>
+          <Typography variant='body-sm' tone='muted' className='mb-2'>
+            Type
+          </Typography>
+          <Select
+            value={filters.type}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                type: e.target.value as TaskType,
+              }))
+            }
+            options={[
+              { value: "", label: "All" },
+              { value: "task", label: "Task" },
+              { value: "bug", label: "Bug" },
+              { value: "feature", label: "Feature" },
+              { value: "epic", label: "Epic" },
+            ]}
+          />
+        </div>
+      </div>
 
-        <div className='flex gap-2'>
+      <div className='flex items-center gap-4'>
+        <div>
+          <Typography variant='body-sm' tone='muted' className='mb-2'>
+            Sort By
+          </Typography>
           <Select
             value={sortBy}
             onChange={(e) =>
@@ -112,18 +127,23 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
             options={[
               { value: "dueDate", label: "Due Date" },
               { value: "priority", label: "Priority" },
-              { value: "createdAt", label: "Created" },
+              { value: "createdAt", label: "Created At" },
             ]}
           />
-          <button
-            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-            className='p-2 border border-gray-300 rounded-lg hover:bg-gray-50'
-          >
-            <ArrowUpDown
-              size={16}
-              className={sortOrder === "asc" ? "rotate-180" : ""}
-            />
-          </button>
+        </div>
+
+        <div>
+          <Typography variant='body-sm' tone='muted' className='mb-2'>
+            Order
+          </Typography>
+          <Select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
+            options={[
+              { value: "asc", label: "Ascending" },
+              { value: "desc", label: "Descending" },
+            ]}
+          />
         </div>
       </div>
     </div>
