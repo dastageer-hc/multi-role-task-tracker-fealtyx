@@ -85,16 +85,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         </Typography>
 
         {/* task dates */}
-        <div className='flex  gap-1 flex-col mt-2 mb-2'>
-          <div className='flex items-center gap-1'>
+        <div className='flex  gap-1 flex-col mt-4 mb-2'>
+          <div className='flex items-center gap-1 text-sm text-gray-500'>
             <Clock className='h-4 w-4' />
-            <span className='font-medium'>Created:</span>{" "}
+            <span className='font-small text-gray-500 '>Created:</span>{" "}
             {formatDate(task.createdAt)}
           </div>
           {task.dueDate && (
-            <div className='flex items-center gap-1'>
+            <div className='flex items-center gap-1 text-sm text-gray-500'>
               <Calendar className='h-4 w-4' />
-              <span className='font-medium'>Due:</span>{" "}
+              <span className='text-sm text-gray-500'>Due:</span>{" "}
               {formatDate(task.dueDate)}
             </div>
           )}
@@ -110,7 +110,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                 tone='default'
                 className='font-medium whitespace-nowrap'
               >
-                {task.assignee?.name}
+                {task?.assignee?.name}
               </Typography>
               <div className='absolute -top-8 left-0 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap'>
                 Assignment to developer
