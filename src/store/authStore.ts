@@ -19,12 +19,6 @@ const DUMMY_USERS: User[] = [
   },
 ];
 
-// Dummy credentials
-const VALID_CREDENTIALS = [
-  { email: "developer@example.com", password: "dev123" },
-  { email: "manager@example.com", password: "man123" },
-];
-
 // Storage keys
 const STORAGE_KEYS = {
   AUTH_TOKEN: "auth-token",
@@ -40,11 +34,11 @@ interface AuthState {
   initializeAuth: () => Promise<void>;
 }
 
-interface Storage {
-  getItem: (name: string) => string | null;
-  setItem: (name: string, value: string) => void;
-  removeItem: (name: string) => void;
-}
+// interface Storage {
+//   getItem: (name: string) => string | null;
+//   setItem: (name: string, value: string) => void;
+//   removeItem: (name: string) => void;
+// }
 
 export const useAuthStore = create<AuthState>()(
   persist(
