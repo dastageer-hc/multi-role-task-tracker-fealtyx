@@ -1,9 +1,9 @@
 import React from "react";
-import { Typography } from "./core-ui/typography";
+import { Typography } from "../core-ui/typography";
 import { TaskStatus, TaskPriority, TaskType } from "@/types/task";
-import { Input } from "./core-ui/input";
-import { Select } from "./core-ui/select";
-import { Button } from "./core-ui/button";
+import { Input } from "../core-ui/input";
+import { Select } from "../core-ui/select";
+import { Button } from "../core-ui/button";
 import { ArrowUp, ArrowDown } from "lucide-react";
 
 interface TaskFiltersProps {

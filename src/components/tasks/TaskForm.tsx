@@ -1,7 +1,7 @@
 import React from "react";
-import { Typography } from "./core-ui/typography";
-import { Input } from "./core-ui/input";
-import { Select } from "./core-ui/select";
+import { Typography } from "../core-ui/typography";
+import { Input } from "../core-ui/input";
+import { Select } from "../core-ui/select";
 import { Task, TaskStatus, TaskPriority, TaskType } from "@/types/task";
 
 interface TaskFormProps {

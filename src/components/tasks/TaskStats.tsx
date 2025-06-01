@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography } from "./core-ui/typography";
+import { Typography } from "../core-ui/typography";
 import { Task, TaskStatus } from "@/types/task";
 
 interface TaskStatsProps {
@@ -86,7 +86,7 @@ export const TaskStats: React.FC<TaskStatsProps> = ({ tasks = [] }) => {
 
         <div className='bg-gray-50 rounded-lg p-4 flex items-center gap-4'>
           <div className='w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center'>
-            <Typography variant='h2' className='text-gray-600'>
+            <Typography variant='body-sm' className='text-gray-600 font-bold'>
               {stats.total > 0
                 ? Math.round((stats.completed / stats.total) * 100)
                 : 0}

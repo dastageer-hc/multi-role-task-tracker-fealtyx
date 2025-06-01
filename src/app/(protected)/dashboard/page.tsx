@@ -3,10 +3,13 @@
 import React from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useTaskStore } from "@/store/taskStore";
-import { TaskForm } from "@/components/TaskForm";
-import { TaskFilters } from "@/components/TaskFilters";
-import { TaskStats } from "@/components/TaskStats";
-import { TimeTrackingChart } from "@/components/TimeTrackingChart";
+import {
+  TaskForm,
+  TaskFilters,
+  TaskStats,
+  TimeTrackingChart,
+  TaskCard,
+} from "@/components/tasks";
 import { Typography } from "@/components/core-ui/typography";
 import { Button } from "@/components/core-ui/button";
 import { Task, TaskStatus, TaskPriority, TaskType } from "@/types/task";
@@ -118,69 +121,12 @@ export default function DashboardPage() {
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           {filteredTasks.map((task) => (
-            <div
+            <TaskCard
               key={task.id}
-              className='bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow'
-            >
-              <div className='flex items-start justify-between mb-4'>
-                <div>
-                  <Typography variant='h3' className='mb-2'>
-                    {task.title}
-                  </Typography>
-                  <Typography variant='body' tone='muted' className='mb-4'>
-                    {task.description}
-                  </Typography>
-                </div>
-                <div className='flex gap-2'>
-                  <Button
-                    variant='secondary'
-                    size='sm'
-                    onClick={() => handleEditTask(task)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant='danger'
-                    size='sm'
-                    onClick={() => handleDeleteTask(task.id)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </div>
-              <div className='flex items-center gap-4'>
-                <div className='flex items-center gap-2'>
-                  <div
-                    className={`w-2 h-2 rounded-full ${
-                      task.status === "done"
-                        ? "bg-green-500"
-                        : task.status === "in_progress"
-                        ? "bg-blue-500"
-                        : task.status === "review"
-                        ? "bg-yellow-500"
-                        : "bg-gray-500"
-                    }`}
-                  />
-                  <Typography variant='body' tone='muted'>
-                    {task.status.replace("_", " ")}
-                  </Typography>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <div
-                    className={`w-2 h-2 rounded-full ${
-                      task.priority === "high"
-                        ? "bg-red-500"
-                        : task.priority === "medium"
-                        ? "bg-yellow-500"
-                        : "bg-green-500"
-                    }`}
-                  />
-                  <Typography variant='body' tone='muted'>
-                    {task.priority}
-                  </Typography>
-                </div>
-              </div>
-            </div>
+              task={task}
+              onEdit={handleEditTask}
+              onDelete={handleDeleteTask}
+            />
           ))}
         </div>
 
@@ -204,7 +150,7 @@ export default function DashboardPage() {
                 </Typography>
                 <Button
                   variant='secondary'
-                  size='sm'
+                  size='small'
                   onClick={() => {
                     setShowTaskForm(false);
                     setEditingTask(undefined);

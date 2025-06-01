@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography } from "./core-ui/typography";
+import { Typography } from "../core-ui/typography";
 import {
   Chart as ChartJS,
   CategoryScale,
