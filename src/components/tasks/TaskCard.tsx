@@ -36,12 +36,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   const taskTypeConfig = getTaskTypeConfig(task.type);
 
   // Filter out 'done' option for developers
-  const availableStatusOptions = statusOptions.filter((option) => {
-    if (user?.role !== "manager" && option.value === "done") {
-      return false;
-    }
-    return true;
-  });
+  const availableStatusOptions = statusOptions;
 
   return (
     <div className='bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow'>
