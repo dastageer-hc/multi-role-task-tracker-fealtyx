@@ -1,7 +1,7 @@
 // src/store/authStore.ts
 import { create } from "zustand";
 import { persist, PersistStorage } from "zustand/middleware";
-import { AuthState as AuthStateType, User } from "@/types/auth";
+import { User } from "@/types/auth";
 
 // Dummy users data
 const DUMMY_USERS: User[] = [
