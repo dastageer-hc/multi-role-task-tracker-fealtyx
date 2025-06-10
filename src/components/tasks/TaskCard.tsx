@@ -9,7 +9,6 @@ import {
   getTaskTypeConfig,
 } from "../../utils/taskUtils";
 import { formatDate } from "../../utils/dateUtils";
-import { useAuthStore } from "@/store/authStore";
 
 interface TaskCardProps {
   task: Task;
@@ -31,7 +30,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onDelete,
   onStatusChange,
 }) => {
-  const { user } = useAuthStore();
   //user.role
   // const backgroundColor = ` bgcolor text`
 

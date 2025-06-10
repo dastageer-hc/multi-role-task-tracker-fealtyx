@@ -45,7 +45,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     assignee: task?.assignee || "",
   });
 
-  const [users, setUsers] = React.useState<any[]>([]);
+  const [users, setUsers] = React.useState<
+    {
+      value: string;
+      label: string;
+    }[]
+  >([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,9 +64,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       .then((res) => res.json())
       .then((data) => {
         setUsers(
-          data.users.map((user: any) => ({
-            value: user.firstName,
-            label: user.firstName,
+          data.users.map((user: { firstName: string; lastName: string }) => ({
+            value: user?.firstName || "",
+            label: user?.firstName || "",
           }))
         );
         console.log("users");
