@@ -562,7 +562,11 @@ export const useTaskStore = create<TaskState>()(
           }
 
           // Apply assignee filter
-          if (filters.assignee && task.assignee?.id !== filters.assignee) {
+          if (
+            filters.assignee &&
+            task?.assignee &&
+            task?.assignee !== filters.assignee
+          ) {
             return false;
           }
 
