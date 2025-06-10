@@ -10,6 +10,7 @@ import {
 } from "../../utils/taskUtils";
 import { formatDate } from "../../utils/dateUtils";
 
+
 interface TaskCardProps {
   task: Task;
   onEdit: (task: Task) => void;
