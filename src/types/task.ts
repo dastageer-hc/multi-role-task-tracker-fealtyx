@@ -53,7 +53,7 @@ export interface Task {
   storyPoints: number;
   acceptanceCriteria: string[];
   testCases: string[];
-  assignee?: User;
+  assignee?: User | string;
   parentTaskId?: string;
   subtasks?: Task[];
   dependencies?: string[];

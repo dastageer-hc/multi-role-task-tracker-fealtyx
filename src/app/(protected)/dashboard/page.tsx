@@ -72,7 +72,7 @@ export default function DashboardPage() {
         const matchesType = !filters.type || task.type === filters.type;
         return matchesSearch && matchesStatus && matchesPriority && matchesType;
       })
-      .sort((a, b) => {
+      .sort((a, b) => { 
         const aValue = a[sortBy];
         const bValue = b[sortBy];
         const modifier = sortOrder === "asc" ? 1 : -1;

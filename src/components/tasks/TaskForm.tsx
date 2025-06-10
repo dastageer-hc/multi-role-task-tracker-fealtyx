@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Typography } from "../core-ui/typography";
 import { Input } from "../core-ui/input";
 import { Select } from "../core-ui/select";
@@ -42,12 +42,35 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     priority: task.priority || "medium",
     type: task.type || "feature",
     dueDate: task.dueDate || new Date().toISOString().split("T")[0],
+    assignee: task?.assignee || "",
   });
+
+  const [users, setUsers] = React.useState<any[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
   };
+
+  // get users from assignee
+  useEffect(() => {
+    const endpoint = "https://dummyjson.com/users";
+    fetch(endpoint)
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(
+          data.users.map((user: any) => ({
+            value: user.firstName,
+            label: user.firstName,
+          }))
+        );
+        console.log("users");
+      });
+  }, []);
+
+  useEffect(() => {
+    console.log("users", users);
+  }, [users]);
 
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
@@ -133,6 +156,20 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               setFormData({ ...formData, dueDate: e.target.value })
             }
             required
+          />
+        </div>
+
+        <div>
+          <Typography variant='body' tone='muted' className='mb-2'>
+            Assignee
+          </Typography>
+          <Select
+            options={users}
+            value={(formData?.assignee as unknown as string) || ""}
+            onChange={(value) =>
+              setFormData({ ...formData, assignee: value as TaskType })
+            }
+            placeholder='Select Assignee'
           />
         </div>
       </div>

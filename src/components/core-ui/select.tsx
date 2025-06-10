@@ -78,10 +78,10 @@ export const Select: React.FC<SelectProps> = ({
       </button>
 
       {isOpen && (
-        <div className='absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto'>
-          {options.map((option) => (
+        <div className='absolute z-10 w-full mt-1 bg-white border border-gray-200 overflow-scroll rounded-lg shadow-lg max-h-60 overflow-auto'>
+          {options.map((option, i) => (
             <button
-              key={option.value}
+              key={option.value + i}
               type='button'
               onClick={() => {
                 onChange(option.value);

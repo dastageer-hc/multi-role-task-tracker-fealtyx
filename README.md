@@ -65,7 +65,7 @@ A modern task management system built with Next.js, featuring role-based access 
 
 ```bash
 git clone <repository-url>
-cd fealtyx-assignment
+cd task-tracker-assignment
 ```
 
 2. Install dependencies:

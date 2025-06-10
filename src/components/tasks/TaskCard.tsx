@@ -32,6 +32,9 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onStatusChange,
 }) => {
   const { user } = useAuthStore();
+  //user.role
+  // const backgroundColor = ` bgcolor text`
+
   const taskPriorityConfig = getTaskPriorityConfig(task.priority);
   const taskTypeConfig = getTaskTypeConfig(task.type);
 
@@ -105,13 +108,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                 tone='default'
                 className='font-medium whitespace-nowrap'
               >
-                {task?.assignee?.name}
+                {`${task?.assignee as unknown as string}`}
               </Typography>
               <div className='absolute -top-8 left-0 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap'>
                 Assignment to developer
               </div>
             </div>
           )}
+
+          {/* <button disabled={role === "developer" ? } > Assign  </button> */}
 
           <div className='flex justify-end w-full bottom-0'>
             <StatusSelect

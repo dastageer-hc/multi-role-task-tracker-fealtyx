@@ -62,7 +62,7 @@ export default function DashboardLayout({
               Project
             </Typography>
             <Typography variant='h3' tone='default' className='mb-1'>
-              FealtyX
+              Task tracker
             </Typography>
           </div>
 
